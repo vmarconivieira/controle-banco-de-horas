@@ -1590,6 +1590,7 @@ function parseTimecardContent(text) {
         out1: it.out1 || null,
         in2: it.in2 || null,
         out2: it.out2 || null,
+        status: it.status || 'Registrado',
         double_hours: !!it.double_hours
       }));
     } catch(e) {}
@@ -1598,13 +1599,21 @@ function parseTimecardContent(text) {
   // CSV / TSV Parsing
   const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
   const results = [];
-  const timeRegex = /\b([01]?\d|2[0-3]):[0-5]\d\b/g;
+  const timeRegex = /\b(?:[01]?\d|2[0-3]):[0-5]\d\b/g;
   const dateBRRegex = /\b(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})\b/;
   const dateISORegex = /\b(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})\b/;
+  const dayWeekdayRegex = /(?:^|,)\s*(\d{1,2})\s*,\s*(SEG|TER|QUA|QUI|SEX|SAB|DOM)\b/i;
+
+  // Attempt to detect year-month from text or default to current (e.g. 2026-10)
+  let inferredYearMonth = '2026-10';
+  const ymMatch = text.match(/\b(0[1-9]|1[0-2])[\/\-](20\d{2})\b/);
+  if (ymMatch) {
+    inferredYearMonth = `${ymMatch[2]}-${ymMatch[1]}`;
+  }
 
   for (const line of lines) {
-    // Ignore metadata and report headers commonly found in Ahgora, Secullum, Senior etc.
-    if (/^(per[ií]odo|emitido|emiss[aã]o|relat[oó]rio|p[aá]gina|cnpj|folha|empresa|colaborador|funcion[aá]rio)/i.test(line)) {
+    // Ignore report headers with general info
+    if (/^(cargo|localiza|cpf|categoria|hor[aá]rios:|,,,,dt,sem)/i.test(line)) {
       continue;
     }
 
@@ -1620,15 +1629,31 @@ function parseTimecardContent(text) {
       const matchISO = line.match(dateISORegex);
       if (matchISO) {
         isoDate = `${matchISO[1]}-${matchISO[2].padStart(2, '0')}-${matchISO[3].padStart(2, '0')}`;
+      } else {
+        // Try day,weekday format as in punto.csv (e.g. ,,,,,01,QUI,0735, ...)
+        const matchDW = line.match(dayWeekdayRegex);
+        if (matchDW) {
+          const day = matchDW[1].padStart(2, '0');
+          isoDate = `${inferredYearMonth}-${day}`;
+        }
       }
     }
 
     if (!isoDate) continue;
 
-    const times = line.match(timeRegex) || [];
-    if (times.length === 0) continue;
+    // Detect status tag if present in line
+    let tag = '';
+    if (/cr[eé]dito\s+banco/i.test(line)) tag = 'Crédito Banco de Horas';
+    else if (/d[eé]bito\s+banco/i.test(line)) tag = 'Débito Banco de Horas';
+    else if (/compensado/i.test(line)) tag = 'Compensado';
+    else if (/dsr/i.test(line)) tag = 'DSR';
+    else if (/feriado/i.test(line)) tag = 'Feriado';
 
-    // Prevent duplicate entries for the same date from the same file
+    const times = line.match(timeRegex) || [];
+
+    // Skip only if there are neither times nor any recognized non-working tag
+    if (times.length === 0 && !tag) continue;
+
     const existingIdx = results.findIndex(it => it.date === isoDate);
     const entryData = {
       date: isoDate,
@@ -1636,6 +1661,7 @@ function parseTimecardContent(text) {
       out1: times[1] || null,
       in2: times[2] || null,
       out2: times[3] || null,
+      status: tag || (times.length >= 2 ? 'Registrado' : 'Folga'),
       double_hours: false
     };
 
@@ -1657,12 +1683,29 @@ const $ = id => document.getElementById(id);
 
 let currentUser = null;
 let userProfile = null;
+let userSettings = {
+  workday: "08:45",
+  tol: 10,
+  refs: ["07:15", "11:40", "13:15", "17:35"],
+  theme: "light"
+};
 let appState = {
   entries: [],
   pointEntries: [],
   planning: [],
   parsedImportEntries: []
 };
+
+function calculateDaySaldo(worked, doubleHours = false, status = '') {
+  const isOffDay = /compensado|dsr|feriado|folga/i.test(status);
+  if (worked === 0 || isOffDay) return 0;
+  const standard = (typeof userSettings !== 'undefined' && userSettings.workday) ? (parseTime(userSettings.workday) || 525) : 525;
+  if (doubleHours) return worked * 2;
+  const diff = worked - standard;
+  const tol = (typeof userSettings !== 'undefined' && typeof userSettings.tol === 'number') ? userSettings.tol : 10;
+  if (Math.abs(diff) <= tol) return 0;
+  return diff;
+}
 
 // PWA SERVICE WORKER REGISTRATION
 if ('serviceWorker' in navigator) {
@@ -1805,11 +1848,16 @@ async function loadUserData() {
 
   if (navigator.onLine) {
     try {
-      const [entries, pointEntries, planning] = await Promise.all([
+      const [entries, pointEntries, planning, settings] = await Promise.all([
         client.select('timebank_entries', 'user_id=eq.' + currentUser.id + '&order=date.desc'),
-        client.select('timebank_point_entries', 'user_id=eq.' + currentUser.id + '&order=date.desc'),
-        client.select('timebank_planning', 'user_id=eq.' + currentUser.id + '&order=date.asc')
+        client.select('timebank_point_entries', 'user_id=eq.' + currentUser.id + '&order=date.asc'),
+        client.select('timebank_planning', 'user_id=eq.' + currentUser.id + '&order=date.asc'),
+        client.select('timebank_settings', 'user_id=eq.' + currentUser.id)
       ]);
+
+      if (settings && settings[0]) {
+        userSettings = { ...userSettings, ...settings[0] };
+      }
 
       appState.entries = entries || [];
       appState.pointEntries = pointEntries || [];
@@ -1847,19 +1895,20 @@ function renderDashboard() {
   let totalSaldoMinutes = 0;
   let mesSaldoMinutes = 0;
   const currentMonth = new Date().toISOString().slice(0, 7);
+  const activeMonth = appState.entries.length > 0 ? appState.entries[0].date.slice(0, 7) : currentMonth;
   const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-  const now = new Date();
-  if ($('kpiNomeMes')) $('kpiNomeMes').textContent = `${monthNames[now.getMonth()]} / ${now.getFullYear()}`;
+  const [y, m] = activeMonth.split('-');
+  if ($('kpiNomeMes')) $('kpiNomeMes').textContent = `${monthNames[parseInt(m, 10) - 1]} / ${y}`;
 
   tbody.innerHTML = appState.entries.map(e => {
     const worked = calculateDailyWorked(e.in1, e.out1, e.in2, e.out2);
-    const standard = 8 * 60;
-    const saldo = e.double_hours ? (worked * 2 - standard) : (worked - standard);
+    const saldo = calculateDaySaldo(worked, e.double_hours, e.status);
     totalSaldoMinutes += saldo;
-    if (e.date.startsWith(currentMonth)) mesSaldoMinutes += saldo;
+    if (e.date.startsWith(activeMonth)) mesSaldoMinutes += saldo;
 
-    const isPos = saldo >= 0;
-    const saldoBadge = `<span class="badge ${isPos ? 'positive' : 'negative'}">${formatMinutes(saldo)}</span>`;
+    const saldoBadge = saldo > 0 
+      ? `<span class="badge positive">${formatMinutes(saldo)}</span>`
+      : (saldo < 0 ? `<span class="badge negative">${formatMinutes(saldo)}</span>` : `<span class="badge neutral">${formatMinutes(0)}</span>`);
     const weekday = getWeekdayName(e.date);
 
     return `
@@ -1914,9 +1963,14 @@ function renderPointTable() {
   tbody.innerHTML = appState.pointEntries.map(p => {
     const batidas = [p.in1, p.out1, p.in2, p.out2].filter(Boolean).join(' • ') || 'Sem batidas';
     const worked = calculateDailyWorked(p.in1, p.out1, p.in2, p.out2);
-    const standard = 8 * 60;
-    const saldo = worked - standard;
-    const isPos = saldo >= 0;
+    const saldo = calculateDaySaldo(worked, false, p.status);
+    const saldoBadge = saldo > 0 
+      ? `<span class="badge positive">${formatMinutes(saldo)}</span>`
+      : (saldo < 0 ? `<span class="badge negative">${formatMinutes(saldo)}</span>` : `<span class="badge neutral">${formatMinutes(0)}</span>`);
+
+    let statusBadgeClass = 'neutral';
+    if (/cr[eé]dito/i.test(p.status)) statusBadgeClass = 'positive';
+    else if (/d[eé]bito/i.test(p.status)) statusBadgeClass = 'negative';
 
     return `
       <tr>
@@ -1924,13 +1978,15 @@ function renderPointTable() {
         <td style="color:var(--mut); font-size:12px;">${getWeekdayName(p.date)}</td>
         <td><span style="font-family:monospace; font-size:12.5px;">${batidas}</span></td>
         <td>${formatMinutes(worked, false)}</td>
-        <td><span class="badge ${isPos ? 'positive' : 'negative'}">${formatMinutes(saldo)}</span></td>
-        <td><span class="badge neutral">${p.status || 'Importado'}</span></td>
+        <td>${saldoBadge}</td>
+        <td><span class="badge ${statusBadgeClass}">${p.status || 'Importado'}</span></td>
         <td>
           <div style="display:flex; gap:6px;">
-            <button class="btn secondary" style="padding:4px 8px; font-size:11.5px;" onclick="convertPointToEntry('${p.date}')">
-              Lançar no Banco
-            </button>
+            ${p.in1 ? `
+              <button class="btn secondary" style="padding:4px 8px; font-size:11.5px;" onclick="convertPointToEntry('${p.date}')">
+                Lançar no Banco
+              </button>
+            ` : ''}
             <button class="btn secondary icon-only" onclick="deletePointEntry('${p.date}')" title="Excluir do espelho">
               <svg class="svg-icon sm" style="stroke:var(--red);"><use href="#icon-trash"/></svg>
             </button>
@@ -1957,7 +2013,7 @@ async function convertPointToEntry(date) {
     in2: p.in2 || null,
     out2: p.out2 || null,
     double_hours: false,
-    status: 'Importado de Cartão Ponto',
+    status: p.status || 'Registrado',
     source: 'point_card'
   };
 
@@ -2273,11 +2329,11 @@ async function executeImport() {
 // EXPORT CSV
 function exportCSV() {
   if (appState.entries.length === 0) return alert("Não há lançamentos para exportar.");
-  const header = "Data;Dia;Entrada 1;Saida 1;Entrada 2;Saida 2;Horas Trabalhadas;Saldo Minutos;Saldo Formatado\n";
+  const header = "Data;Dia;Entrada 1;Saida 1;Entrada 2;Saida 2;Horas Trabalhadas;Saldo Minutos;Saldo Formatado;Status\n";
   const rows = appState.entries.map(e => {
     const worked = calculateDailyWorked(e.in1, e.out1, e.in2, e.out2);
-    const saldo = worked - (8 * 60);
-    return `${formatDateBR(e.date)};${getWeekdayName(e.date)};${e.in1 || ''};${e.out1 || ''};${e.in2 || ''};${e.out2 || ''};${formatMinutes(worked, false)};${saldo};${formatMinutes(saldo)}`;
+    const saldo = calculateDaySaldo(worked, e.double_hours, e.status);
+    return `${formatDateBR(e.date)};${getWeekdayName(e.date)};${e.in1 || ''};${e.out1 || ''};${e.in2 || ''};${e.out2 || ''};${formatMinutes(worked, false)};${saldo};${formatMinutes(saldo)};${e.status || ''}`;
   }).join('\n');
 
   const blob = new Blob([header + rows], { type: 'text/csv;charset=utf-8;' });

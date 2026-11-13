@@ -1,0 +1,27 @@
+Cargo:,AUDITOR INTERNO TR,CPF:,107.838.519-01
+Localização:,001.015.00.01.00.00,AUDITORIA INTERNA,Categoria:,Mensalista
+,,Horários:,735,07:15 11:40 13:15 17:35,
+,,,,,DT,Sem,Hor,Marcações
+,,,,,01,QUI,0735, 07:22 11:43 13:19 17:39
+,,,,,02,SEX,0735, 07:19 11:41 13:03 18:00  Credito Banco de Horas
+,,,,,03,SAB,9998,  Compensado
+,,,,,04,DOM,9999,  DSR
+,,,,,05,SEG,0735, 07:19 11:42 13:20 17:39
+,,,,,06,TER,0735, 07:15 11:41 13:24 17:38
+,,,,,07,QUA,0735, 07:16 11:42 13:18 17:39
+,,,,,08,QUI,0735, 07:14 11:45 13:16 17:49  Credito Banco de Horas
+,,,,,09,SEX,0735, 07:19 11:43 13:50 17:17  Debito Banco de Horas
+,,,,,10,SAB,9998,  Compensado
+,,,,,11,DOM,9999,  DSR
+,,,,,12,SEG,9997,  Feriado
+,,,,,13,TER,0735, 07:15 11:40 13:15 18:34  Credito Banco de Horas
+,,,,,14,QUA,0735, 07:15 11:40 13:15 18:15  Credito Banco de Horas
+,,,,,15,QUI,0735, 07:15 11:40 13:15 18:36  Credito Banco de Horas
+,,,,,16,SEX,0735, 07:15 11:40 13:15 18:29  Credito Banco de Horas
+,,,,,17,SAB,9998,  Compensado
+,,,,,18,DOM,9999,  DSR
+,,,,,19,SEG,9997,  Feriado
+,,,,,20,TER,0735, 07:16 11:42 13:19 17:39
+,,,,,21,QUA,0735, 07:18 11:43 13:19 17:39
+,,,,,22,QUI,0735, 07:18 11:42 13:22 17:38
+,,,,,23,SEX,0735, 07:11 11:41 13:20 17:36

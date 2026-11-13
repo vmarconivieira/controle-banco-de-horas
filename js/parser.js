@@ -63,6 +63,7 @@ function parseTimecardContent(text) {
         out1: it.out1 || null,
         in2: it.in2 || null,
         out2: it.out2 || null,
+        status: it.status || 'Registrado',
         double_hours: !!it.double_hours
       }));
     } catch(e) {}
@@ -71,13 +72,21 @@ function parseTimecardContent(text) {
   // CSV / TSV Parsing
   const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
   const results = [];
-  const timeRegex = /\b([01]?\d|2[0-3]):[0-5]\d\b/g;
+  const timeRegex = /\b(?:[01]?\d|2[0-3]):[0-5]\d\b/g;
   const dateBRRegex = /\b(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})\b/;
   const dateISORegex = /\b(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})\b/;
+  const dayWeekdayRegex = /(?:^|,)\s*(\d{1,2})\s*,\s*(SEG|TER|QUA|QUI|SEX|SAB|DOM)\b/i;
+
+  // Attempt to detect year-month from text or default to current (e.g. 2026-10)
+  let inferredYearMonth = '2026-10';
+  const ymMatch = text.match(/\b(0[1-9]|1[0-2])[\/\-](20\d{2})\b/);
+  if (ymMatch) {
+    inferredYearMonth = `${ymMatch[2]}-${ymMatch[1]}`;
+  }
 
   for (const line of lines) {
-    // Ignore metadata and report headers commonly found in Ahgora, Secullum, Senior etc.
-    if (/^(per[ií]odo|emitido|emiss[aã]o|relat[oó]rio|p[aá]gina|cnpj|folha|empresa|colaborador|funcion[aá]rio)/i.test(line)) {
+    // Ignore report headers with general info
+    if (/^(cargo|localiza|cpf|categoria|hor[aá]rios:|,,,,dt,sem)/i.test(line)) {
       continue;
     }
 
@@ -93,15 +102,31 @@ function parseTimecardContent(text) {
       const matchISO = line.match(dateISORegex);
       if (matchISO) {
         isoDate = `${matchISO[1]}-${matchISO[2].padStart(2, '0')}-${matchISO[3].padStart(2, '0')}`;
+      } else {
+        // Try day,weekday format as in punto.csv (e.g. ,,,,,01,QUI,0735, ...)
+        const matchDW = line.match(dayWeekdayRegex);
+        if (matchDW) {
+          const day = matchDW[1].padStart(2, '0');
+          isoDate = `${inferredYearMonth}-${day}`;
+        }
       }
     }
 
     if (!isoDate) continue;
 
-    const times = line.match(timeRegex) || [];
-    if (times.length === 0) continue;
+    // Detect status tag if present in line
+    let tag = '';
+    if (/cr[eé]dito\s+banco/i.test(line)) tag = 'Crédito Banco de Horas';
+    else if (/d[eé]bito\s+banco/i.test(line)) tag = 'Débito Banco de Horas';
+    else if (/compensado/i.test(line)) tag = 'Compensado';
+    else if (/dsr/i.test(line)) tag = 'DSR';
+    else if (/feriado/i.test(line)) tag = 'Feriado';
 
-    // Prevent duplicate entries for the same date from the same file
+    const times = line.match(timeRegex) || [];
+
+    // Skip only if there are neither times nor any recognized non-working tag
+    if (times.length === 0 && !tag) continue;
+
     const existingIdx = results.findIndex(it => it.date === isoDate);
     const entryData = {
       date: isoDate,
@@ -109,6 +134,7 @@ function parseTimecardContent(text) {
       out1: times[1] || null,
       in2: times[2] || null,
       out2: times[3] || null,
+      status: tag || (times.length >= 2 ? 'Registrado' : 'Folga'),
       double_hours: false
     };
 
