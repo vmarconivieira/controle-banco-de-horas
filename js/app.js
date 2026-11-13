@@ -193,6 +193,9 @@ function renderDashboard() {
   let totalSaldoMinutes = 0;
   let mesSaldoMinutes = 0;
   const currentMonth = new Date().toISOString().slice(0, 7);
+  const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+  const now = new Date();
+  if ($('kpiNomeMes')) $('kpiNomeMes').textContent = `${monthNames[now.getMonth()]} / ${now.getFullYear()}`;
 
   tbody.innerHTML = appState.entries.map(e => {
     const worked = calculateDailyWorked(e.in1, e.out1, e.in2, e.out2);
@@ -270,13 +273,98 @@ function renderPointTable() {
         <td><span class="badge ${isPos ? 'positive' : 'negative'}">${formatMinutes(saldo)}</span></td>
         <td><span class="badge neutral">${p.status || 'Importado'}</span></td>
         <td>
-          <button class="btn secondary" style="padding:4px 8px; font-size:11.5px;" onclick="convertPointToEntry('${p.date}')">
-            Lançar no Banco
-          </button>
+          <div style="display:flex; gap:6px;">
+            <button class="btn secondary" style="padding:4px 8px; font-size:11.5px;" onclick="convertPointToEntry('${p.date}')">
+              Lançar no Banco
+            </button>
+            <button class="btn secondary icon-only" onclick="deletePointEntry('${p.date}')" title="Excluir do espelho">
+              <svg class="svg-icon sm" style="stroke:var(--red);"><use href="#icon-trash"/></svg>
+            </button>
+          </div>
         </td>
       </tr>
     `;
   }).join('');
+}
+
+async function convertPointToEntry(date) {
+  if (!currentUser) return;
+  const p = appState.pointEntries.find(it => it.date === date);
+  if (!p) {
+    showToast("Registro de ponto não encontrado.", "error");
+    return;
+  }
+
+  const newRecord = {
+    user_id: currentUser.id,
+    date: p.date,
+    in1: p.in1 || null,
+    out1: p.out1 || null,
+    in2: p.in2 || null,
+    out2: p.out2 || null,
+    double_hours: false,
+    status: 'Importado de Cartão Ponto',
+    source: 'point_card'
+  };
+
+  const existingIdx = appState.entries.findIndex(e => e.date === date);
+  if (existingIdx >= 0) appState.entries[existingIdx] = newRecord;
+  else appState.entries.unshift(newRecord);
+  appState.entries.sort((a, b) => b.date.localeCompare(a.date));
+
+  OfflineRepository.saveSnapshot(currentUser.id, appState);
+  renderAllViews();
+  showToast(`Dia ${formatDateBR(date)} lançado no Banco de Horas!`, "success");
+
+  if (navigator.onLine) {
+    try {
+      await client.upsert('timebank_entries', newRecord);
+    } catch(err) {
+      OfflineRepository.addToQueue(currentUser.id, { action: 'upsert', table: 'timebank_entries', data: newRecord });
+    }
+  } else {
+    OfflineRepository.addToQueue(currentUser.id, { action: 'upsert', table: 'timebank_entries', data: newRecord });
+  }
+}
+
+async function deletePointEntry(date) {
+  if (!confirm(`Deseja remover o ponto do dia ${formatDateBR(date)} do espelho?`)) return;
+  if (!currentUser) return;
+
+  appState.pointEntries = appState.pointEntries.filter(it => it.date !== date);
+  OfflineRepository.saveSnapshot(currentUser.id, appState);
+  renderPointTable();
+  if ($('kpiCreditosPonto')) $('kpiCreditosPonto').textContent = appState.pointEntries.length;
+  showToast("Registro removido do espelho de ponto.", "info");
+
+  const filter = `user_id=eq.${currentUser.id}&date=eq.${date}`;
+  if (navigator.onLine) {
+    try {
+      await client.delete('timebank_point_entries', filter);
+    } catch(err) {
+      OfflineRepository.addToQueue(currentUser.id, { action: 'delete', table: 'timebank_point_entries', filter });
+    }
+  } else {
+    OfflineRepository.addToQueue(currentUser.id, { action: 'delete', table: 'timebank_point_entries', filter });
+  }
+}
+
+async function handleClearPoint() {
+  if (appState.pointEntries.length === 0) return alert("Não há registros de ponto importados para limpar.");
+  if (!confirm("Deseja apagar todos os registros do espelho de ponto importado?")) return;
+  if (!currentUser) return;
+
+  appState.pointEntries = [];
+  OfflineRepository.saveSnapshot(currentUser.id, appState);
+  renderPointTable();
+  if ($('kpiCreditosPonto')) $('kpiCreditosPonto').textContent = 0;
+  showToast("Espelho de ponto limpo.", "info");
+
+  if (navigator.onLine) {
+    try {
+      await client.delete('timebank_point_entries', 'user_id=eq.' + currentUser.id);
+    } catch(e) {}
+  }
 }
 
 function renderPlanningTable() {
@@ -470,12 +558,31 @@ async function executeImport() {
     source: 'csv_import'
   }));
 
+  const pointEntriesToSave = appState.parsedImportEntries.map(it => ({
+    user_id: currentUser.id,
+    date: it.date,
+    in1: it.in1,
+    out1: it.out1,
+    in2: it.in2,
+    out2: it.out2,
+    status: 'Importado',
+    source: 'ponto'
+  }));
+
   for (const item of entriesToSave) {
     const idx = appState.entries.findIndex(e => e.date === item.date);
     if (idx >= 0) appState.entries[idx] = item;
     else appState.entries.push(item);
   }
   appState.entries.sort((a, b) => b.date.localeCompare(a.date));
+
+  for (const pItem of pointEntriesToSave) {
+    const pIdx = appState.pointEntries.findIndex(e => e.date === pItem.date);
+    if (pIdx >= 0) appState.pointEntries[pIdx] = pItem;
+    else appState.pointEntries.push(pItem);
+  }
+  appState.pointEntries.sort((a, b) => b.date.localeCompare(a.date));
+
   OfflineRepository.saveSnapshot(currentUser.id, appState);
   renderAllViews();
 
@@ -490,9 +597,19 @@ async function executeImport() {
         OfflineRepository.addToQueue(currentUser.id, { action: 'upsert', table: 'timebank_entries', data: item });
       }
     }
+    for (const pItem of pointEntriesToSave) {
+      try {
+        await client.upsert('timebank_point_entries', pItem);
+      } catch(e) {
+        OfflineRepository.addToQueue(currentUser.id, { action: 'upsert', table: 'timebank_point_entries', data: pItem });
+      }
+    }
   } else {
     for (const item of entriesToSave) {
       OfflineRepository.addToQueue(currentUser.id, { action: 'upsert', table: 'timebank_entries', data: item });
+    }
+    for (const pItem of pointEntriesToSave) {
+      OfflineRepository.addToQueue(currentUser.id, { action: 'upsert', table: 'timebank_point_entries', data: pItem });
     }
   }
   btn.disabled = false;
@@ -751,17 +868,47 @@ async function handleSavePlan(e) {
   const item = { user_id: currentUser.id, date, type, hours };
   appState.planning.push(item);
   renderPlanningTable();
+  OfflineRepository.saveSnapshot(currentUser.id, appState);
   showToast("Meta planejada adicionada!", "success");
 
   if (navigator.onLine) {
-    try { await client.upsert('timebank_planning', item); } catch(err) {}
+    try {
+      const res = await client.upsert('timebank_planning', item);
+      if (res && res[0] && res[0].id) item.id = res[0].id;
+      OfflineRepository.saveSnapshot(currentUser.id, appState);
+    } catch(err) {
+      OfflineRepository.addToQueue(currentUser.id, { action: 'upsert', table: 'timebank_planning', data: item });
+    }
+  } else {
+    OfflineRepository.addToQueue(currentUser.id, { action: 'upsert', table: 'timebank_planning', data: item });
   }
 }
 
-async function deletePlan(idOrIdx) {
-  appState.planning.splice(idOrIdx, 1);
+async function deletePlan(identifier) {
+  if (!confirm("Deseja realmente remover esta meta?")) return;
+  if (!currentUser) return;
+
+  const idx = appState.planning.findIndex((it, index) => (it.id && String(it.id) === String(identifier)) || String(index) === String(identifier) || it.date === identifier);
+  let removed = null;
+  if (idx >= 0) {
+    removed = appState.planning.splice(idx, 1)[0];
+  }
+  OfflineRepository.saveSnapshot(currentUser.id, appState);
   renderPlanningTable();
   showToast("Meta removida.", "info");
+
+  if (removed) {
+    const filter = removed.id ? `id=eq.${removed.id}` : `user_id=eq.${currentUser.id}&date=eq.${removed.date}`;
+    if (navigator.onLine) {
+      try {
+        await client.delete('timebank_planning', filter);
+      } catch(err) {
+        OfflineRepository.addToQueue(currentUser.id, { action: 'delete', table: 'timebank_planning', filter });
+      }
+    } else {
+      OfflineRepository.addToQueue(currentUser.id, { action: 'delete', table: 'timebank_planning', filter });
+    }
+  }
 }
 
 // INITIALIZATION

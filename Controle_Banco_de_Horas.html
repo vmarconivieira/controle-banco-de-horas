@@ -13,673 +13,675 @@
   <title>Controle de Banco de Horas</title>
   
   <style>
-  :root {
-    --g: #0f6b45;
-    --g-hover: #0c5637;
-    --g-light: #e8f5ee;
-    --gd: #13251f;
-    --gd-surface: #19332b;
-    --line: #e2ebe5;
-    --txt: #14241d;
-    --mut: #5e7368;
-    --surface: #ffffff;
-    --surface-2: #f8faf9;
-    --page: #edf4ef;
-    --red: #b91c1c;
-    --red-light: #fee2e2;
-    --amber: #b45309;
-    --amber-light: #fef3c7;
-    --blue: #1d4ed8;
-    --blue-light: #dbeafe;
-    --shadow: 0 10px 28px rgba(19, 37, 31, .07);
-    --shadow-sm: 0 2px 8px rgba(19, 37, 31, .05);
-    --ring: 0 0 0 3px rgba(15, 107, 69, .16);
-    --radius-sm: 6px;
-    --radius-md: 10px;
-    --radius-lg: 16px;
-    --radius-xl: 22px;
-    --sw: 260px;
-    --sn: 72px;
-  }
+/* DESIGN TOKENS & LOVABLE THEME */
+:root {
+  --g: #0f6b45;
+  --g-hover: #0c5637;
+  --g-light: #e8f5ee;
+  --gd: #13251f;
+  --gd-surface: #19332b;
+  --line: #e2ebe5;
+  --txt: #14241d;
+  --mut: #5e7368;
+  --surface: #ffffff;
+  --surface-2: #f8faf9;
+  --page: #edf4ef;
+  --red: #b91c1c;
+  --red-light: #fee2e2;
+  --amber: #b45309;
+  --amber-light: #fef3c7;
+  --blue: #1d4ed8;
+  --blue-light: #dbeafe;
+  --shadow: 0 10px 28px rgba(19, 37, 31, .07);
+  --shadow-sm: 0 2px 8px rgba(19, 37, 31, .05);
+  --ring: 0 0 0 3px rgba(15, 107, 69, .16);
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
+  --sw: 260px;
+  --sn: 72px;
+}
 
-  body.dark {
-    --g: #10b981;
-    --g-hover: #059669;
-    --g-light: #132e23;
-    --gd: #0a1410;
-    --gd-surface: #11221b;
-    --line: #223c31;
-    --txt: #e6f1ec;
-    --mut: #8aa598;
-    --surface: #142820;
-    --surface-2: #102019;
-    --page: #0b1712;
-    --red-light: #3d1416;
-    --amber-light: #3b2810;
-    --blue-light: #132845;
-    --shadow: 0 10px 28px rgba(0, 0, 0, .4);
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, .3);
-  }
+body.dark {
+  --g: #10b981;
+  --g-hover: #059669;
+  --g-light: #132e23;
+  --gd: #0a1410;
+  --gd-surface: #11221b;
+  --line: #223c31;
+  --txt: #e6f1ec;
+  --mut: #8aa598;
+  --surface: #142820;
+  --surface-2: #102019;
+  --page: #0b1712;
+  --red-light: #3d1416;
+  --amber-light: #3b2810;
+  --blue-light: #132845;
+  --shadow: 0 10px 28px rgba(0, 0, 0, .4);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, .3);
+}
 
-  * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-  body {
-    margin: 0;
-    background: var(--page);
-    color: var(--txt);
-    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    letter-spacing: -0.015em;
-    min-height: 100vh;
-    -webkit-font-smoothing: antialiased;
-  }
-  button, input, select, textarea { font: inherit; }
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--txt);
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  letter-spacing: -0.015em;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+button, input, select, textarea { font: inherit; }
 
-  /* SVG Icons */
-  .svg-icon {
-    display: inline-block;
-    width: 18px;
-    height: 18px;
-    stroke-width: 2;
-    stroke: currentColor;
-    fill: none;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    vertical-align: middle;
-    flex-shrink: 0;
-  }
-  .svg-icon.sm { width: 15px; height: 15px; }
-  .svg-icon.lg { width: 22px; height: 22px; }
+/* SVG Icons */
+.svg-icon {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  stroke-width: 2;
+  stroke: currentColor;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+.svg-icon.sm { width: 15px; height: 15px; }
+.svg-icon.lg { width: 22px; height: 22px; }
 
-  /* Sidebar */
-  .side {
-    position: fixed;
-    inset: 0 auto 0 0;
-    width: var(--sw);
-    background: linear-gradient(180deg, #13251f 0%, #0d1a15 100%);
-    color: white;
-    z-index: 40;
-    transition: width .2s ease, transform .2s ease;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    border-right: 1px solid rgba(255, 255, 255, 0.06);
-  }
-  .sidehead {
-    height: 68px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 18px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  }
-  .brand {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-weight: 700;
-    font-size: 15px;
-    letter-spacing: -0.02em;
-    color: #ffffff;
-    white-space: nowrap;
-  }
-  .brand-badge {
-    width: 32px;
-    height: 32px;
-    background: #0f6b45;
-    border-radius: var(--radius-md);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-  }
-  .sidehead button {
-    background: transparent;
-    border: none;
-    color: #9cb8a9;
-    padding: 6px;
-    cursor: pointer;
-    border-radius: var(--radius-sm);
-    display: flex;
-    align-items: center;
-  }
-  .sidehead button:hover { color: white; background: rgba(255, 255, 255, 0.08); }
+/* Sidebar */
+.side {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: var(--sw);
+  background: linear-gradient(180deg, #13251f 0%, #0d1a15 100%);
+  color: white;
+  z-index: 40;
+  transition: width .2s ease, transform .2s ease;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+.sidehead {
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+  white-space: nowrap;
+}
+.brand-badge {
+  width: 32px;
+  height: 32px;
+  background: #0f6b45;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+.sidehead button {
+  background: transparent;
+  border: none;
+  color: #9cb8a9;
+  padding: 6px;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+}
+.sidehead button:hover { color: white; background: rgba(255, 255, 255, 0.08); }
 
-  .nav {
-    flex: 1;
-    padding: 14px 10px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-  .nav-group-label {
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: #6d887a;
-    padding: 12px 10px 4px;
-    white-space: nowrap;
-  }
-  .nav button {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 12px;
-    background: transparent;
-    border: none;
-    color: #b1cebe;
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    font-size: 13.5px;
-    font-weight: 500;
-    transition: all .15s ease;
-    text-align: left;
-    white-space: nowrap;
-  }
-  .nav button:hover {
-    background: rgba(255, 255, 255, 0.07);
-    color: #ffffff;
-  }
-  .nav button.active {
-    background: #0f6b45;
-    color: #ffffff;
-    font-weight: 600;
-    box-shadow: 0 4px 12px rgba(15, 107, 69, 0.35);
-  }
+.nav {
+  flex: 1;
+  padding: 14px 10px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.nav-group-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #6d887a;
+  padding: 12px 10px 4px;
+  white-space: nowrap;
+}
+.nav button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background: transparent;
+  border: none;
+  color: #b1cebe;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: 13.5px;
+  font-weight: 500;
+  transition: all .15s ease;
+  text-align: left;
+  white-space: nowrap;
+}
+.nav button:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: #ffffff;
+}
+.nav button.active {
+  background: #0f6b45;
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(15, 107, 69, 0.35);
+}
 
-  .sidefoot {
-    padding: 14px 14px;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  .user-chip {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 10px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    transition: background .15s ease;
-  }
-  .user-chip:hover { background: rgba(255, 255, 255, 0.1); }
-  .user-avatar {
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    background: #0f6b45;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 13px;
-    flex-shrink: 0;
-  }
-  .user-meta {
-    overflow: hidden;
-    line-height: 1.25;
-  }
-  .user-meta .name {
-    font-size: 13px;
-    font-weight: 600;
-    color: white;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .user-meta .role-pill {
-    font-size: 11px;
-    color: #8db59f;
-  }
+.sidefoot {
+  padding: 14px 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background .15s ease;
+}
+.user-chip:hover { background: rgba(255, 255, 255, 0.1); }
+.user-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #0f6b45;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.user-meta {
+  overflow: hidden;
+  line-height: 1.25;
+}
+.user-meta .name {
+  font-size: 13px;
+  font-weight: 600;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.user-meta .role-pill {
+  font-size: 11px;
+  color: #8db59f;
+}
 
-  /* Compact collapsed sidebar */
-  body.side-collapsed .side { width: var(--sn); }
-  body.side-collapsed .brand span,
-  body.side-collapsed .nav-group-label,
-  body.side-collapsed .nav button .nav-label,
-  body.side-collapsed .user-meta { display: none; }
-  body.side-collapsed .main { margin-left: var(--sn); }
+/* Compact collapsed sidebar */
+body.side-collapsed .side { width: var(--sn); }
+body.side-collapsed .brand span,
+body.side-collapsed .nav-group-label,
+body.side-collapsed .nav button .nav-label,
+body.side-collapsed .user-meta { display: none; }
+body.side-collapsed .main { margin-left: var(--sn); }
 
-  /* Main Wrapper */
-  .main {
-    margin-left: var(--sw);
-    min-height: 100vh;
-    transition: margin-left .2s ease;
-    display: flex;
-    flex-direction: column;
-  }
+/* Main Wrapper */
+.main {
+  margin-left: var(--sw);
+  min-height: 100vh;
+  transition: margin-left .2s ease;
+  display: flex;
+  flex-direction: column;
+}
 
-  /* Header */
-  .topbar {
-    height: 68px;
-    background: var(--surface);
-    border-bottom: 1px solid var(--line);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 24px;
-    position: sticky;
-    top: 0;
-    z-index: 30;
-    backdrop-filter: blur(8px);
-  }
-  .topbar-left {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-  .page-title {
-    font-size: 18px;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    margin: 0;
-  }
-  .topbar-right {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
+/* Header */
+.topbar {
+  height: 68px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  backdrop-filter: blur(8px);
+}
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.page-title {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
-  /* Network / Sync Status Pill */
-  .status-pill {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    padding: 5px 12px;
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 500;
-    background: var(--surface-2);
-    border: 1px solid var(--line);
-    color: var(--mut);
-    transition: all .2s ease;
-  }
-  .status-pill.online { color: #0f6b45; background: var(--g-light); border-color: transparent; }
-  .status-pill.offline { color: var(--amber); background: var(--amber-light); border-color: transparent; }
-  .status-pill.syncing { color: var(--blue); background: var(--blue-light); border-color: transparent; }
-  .pulse-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: currentColor;
-    display: inline-block;
-  }
-  .status-pill.syncing .pulse-dot {
-    animation: spin 1s linear infinite;
-  }
-  @keyframes spin { 100% { transform: rotate(360deg); } }
+/* Network / Sync Status Pill */
+.status-pill {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  color: var(--mut);
+  transition: all .2s ease;
+}
+.status-pill.online { color: #0f6b45; background: var(--g-light); border-color: transparent; }
+.status-pill.offline { color: var(--amber); background: var(--amber-light); border-color: transparent; }
+.status-pill.syncing { color: var(--blue); background: var(--blue-light); border-color: transparent; }
+.pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  display: inline-block;
+}
+.status-pill.syncing .pulse-dot {
+  animation: spin 1s linear infinite;
+}
+@keyframes spin { 100% { transform: rotate(360deg); } }
 
-  /* Action Buttons */
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 7px;
-    padding: 8px 14px;
-    border-radius: var(--radius-md);
-    font-size: 13.5px;
-    font-weight: 600;
-    border: 1px solid transparent;
-    cursor: pointer;
-    transition: all .15s ease;
-    text-decoration: none;
-    line-height: 1.2;
-    white-space: nowrap;
-  }
-  .btn.primary {
-    background: var(--g);
-    color: white;
-    box-shadow: 0 2px 6px rgba(15, 107, 69, 0.2);
-  }
-  .btn.primary:hover { background: var(--g-hover); }
-  .btn.secondary {
-    background: var(--surface);
-    color: var(--txt);
-    border-color: var(--line);
-  }
-  .btn.secondary:hover { background: var(--surface-2); border-color: #c9dbd0; }
-  .btn.danger {
-    background: var(--surface);
-    color: var(--red);
-    border-color: #fecaca;
-  }
-  .btn.danger:hover { background: var(--red-light); }
-  .btn.icon-only { padding: 8px; border-radius: var(--radius-md); }
+/* Action Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 8px 14px;
+  border-radius: var(--radius-md);
+  font-size: 13.5px;
+  font-weight: 600;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all .15s ease;
+  text-decoration: none;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.btn.primary {
+  background: var(--g);
+  color: white;
+  box-shadow: 0 2px 6px rgba(15, 107, 69, 0.2);
+}
+.btn.primary:hover { background: var(--g-hover); }
+.btn.secondary {
+  background: var(--surface);
+  color: var(--txt);
+  border-color: var(--line);
+}
+.btn.secondary:hover { background: var(--surface-2); border-color: #c9dbd0; }
+.btn.danger {
+  background: var(--surface);
+  color: var(--red);
+  border-color: #fecaca;
+}
+.btn.danger:hover { background: var(--red-light); }
+.btn.icon-only { padding: 8px; border-radius: var(--radius-md); }
 
-  /* Content area */
-  .content {
-    flex: 1;
-    padding: 24px;
-    max-width: 1440px;
-    width: 100%;
-    margin: 0 auto;
-  }
-  .view { display: none; }
-  .view.active { display: block; animation: fadeIn .2s ease; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+/* Content area */
+.content {
+  flex: 1;
+  padding: 24px;
+  max-width: 1440px;
+  width: 100%;
+  margin: 0 auto;
+}
+.view { display: none; }
+.view.active { display: block; animation: fadeIn .2s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 
-  /* KPI Grid */
-  .kpi-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-    gap: 16px;
-    margin-bottom: 22px;
-  }
-  .kpi-card {
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-lg);
-    padding: 18px 20px;
-    box-shadow: var(--shadow-sm);
-    position: relative;
-    overflow: hidden;
-  }
-  .kpi-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 8px;
-  }
-  .kpi-label {
-    font-size: 12.5px;
-    font-weight: 600;
-    color: var(--mut);
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-  }
-  .kpi-icon-wrap {
-    width: 32px;
-    height: 32px;
-    border-radius: var(--radius-md);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--surface-2);
-    color: var(--g);
-  }
-  .kpi-val {
-    font-size: 26px;
-    font-weight: 700;
-    letter-spacing: -0.03em;
-    color: var(--txt);
-    margin: 0;
-  }
-  .kpi-sub {
-    font-size: 12px;
-    color: var(--mut);
-    margin-top: 4px;
-  }
+/* KPI Grid */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 16px;
+  margin-bottom: 22px;
+}
+.kpi-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+}
+.kpi-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.kpi-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--mut);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.kpi-icon-wrap {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-2);
+  color: var(--g);
+}
+.kpi-val {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--txt);
+  margin: 0;
+}
+.kpi-sub {
+  font-size: 12px;
+  color: var(--mut);
+  margin-top: 4px;
+}
 
-  /* Cards */
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-lg);
-    padding: 20px;
-    box-shadow: var(--shadow-sm);
-    margin-bottom: 22px;
-  }
-  .card-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 16px;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-  .card-title {
-    font-size: 16px;
-    font-weight: 700;
-    margin: 0;
-    letter-spacing: -0.02em;
-    display: flex;
-    align-items: center;
-    gap: 9px;
-  }
+/* Cards */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 22px;
+}
+.card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.card-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
 
-  /* Tables */
-  .table-responsive {
-    overflow-x: auto;
-    border-radius: var(--radius-md);
-    border: 1px solid var(--line);
-  }
-  table.data-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-    text-align: left;
-    background: var(--surface);
-  }
-  table.data-table th {
-    background: var(--surface-2);
-    padding: 11px 14px;
-    font-weight: 600;
-    color: var(--mut);
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    border-bottom: 1px solid var(--line);
-    white-space: nowrap;
-  }
-  table.data-table td {
-    padding: 12px 14px;
-    border-bottom: 1px solid var(--line);
-    color: var(--txt);
-    vertical-align: middle;
-  }
-  table.data-table tbody tr:last-child td { border-bottom: none; }
-  table.data-table tbody tr:hover { background: rgba(15, 107, 69, 0.03); }
+/* Tables */
+.table-responsive {
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line);
+}
+table.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  text-align: left;
+  background: var(--surface);
+}
+table.data-table th {
+  background: var(--surface-2);
+  padding: 11px 14px;
+  font-weight: 600;
+  color: var(--mut);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+table.data-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+  color: var(--txt);
+  vertical-align: middle;
+}
+table.data-table tbody tr:last-child td { border-bottom: none; }
+table.data-table tbody tr:hover { background: rgba(15, 107, 69, 0.03); }
 
-  /* Badge Pills */
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 3px 9px;
-    border-radius: 999px;
-    font-size: 11.5px;
-    font-weight: 600;
-    line-height: 1.2;
-  }
-  .badge.positive { background: #dcfce7; color: #15803d; }
-  .badge.negative { background: #fee2e2; color: #b91c1c; }
-  .badge.neutral { background: #f1f5f9; color: #475569; }
-  .badge.admin { background: #fef3c7; color: #b45309; }
-  .badge.user { background: #e0e7ff; color: #3730a3; }
+/* Badge Pills */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+.badge.positive { background: #dcfce7; color: #15803d; }
+.badge.negative { background: #fee2e2; color: #b91c1c; }
+.badge.neutral { background: #f1f5f9; color: #475569; }
+.badge.admin { background: #fef3c7; color: #b45309; }
+.badge.user { background: #e0e7ff; color: #3730a3; }
 
-  /* Form Elements */
-  .formgrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 14px;
-    align-items: flex-end;
-  }
-  .field {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-  .field label {
-    font-size: 12.5px;
-    font-weight: 600;
-    color: var(--mut);
-  }
-  .field input, .field select, .field textarea {
-    padding: 9px 12px;
-    border-radius: var(--radius-md);
-    border: 1px solid var(--line);
-    background: var(--surface);
-    color: var(--txt);
-    font-size: 13.5px;
-    transition: all .15s ease;
-  }
-  .field input:focus, .field select:focus, .field textarea:focus {
-    outline: none;
-    border-color: var(--g);
-    box-shadow: var(--ring);
-  }
+/* Form Elements */
+.formgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  align-items: flex-end;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.field label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--mut);
+}
+.field input, .field select, .field textarea {
+  padding: 9px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--txt);
+  font-size: 13.5px;
+  transition: all .15s ease;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  outline: none;
+  border-color: var(--g);
+  box-shadow: var(--ring);
+}
 
-  /* Modals */
-  .modal-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(10, 20, 16, 0.65);
-    backdrop-filter: blur(5px);
-    z-index: 100;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-  }
-  .modal-backdrop.open { display: flex; animation: fadeIn .15s ease; }
-  .modal-box {
-    background: var(--surface);
-    border-radius: var(--radius-xl);
-    width: 100%;
-    max-width: 540px;
-    box-shadow: var(--shadow);
-    border: 1px solid var(--line);
-    overflow: hidden;
-    max-height: 90vh;
-    display: flex;
-    flex-direction: column;
-  }
-  .modal-box.wide { max-width: 780px; }
-  .modal-header {
-    padding: 18px 22px;
-    border-bottom: 1px solid var(--line);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .modal-header h3 {
-    margin: 0;
-    font-size: 17px;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .modal-close-btn {
-    background: transparent;
-    border: none;
-    color: var(--mut);
-    padding: 6px;
-    cursor: pointer;
-    border-radius: var(--radius-sm);
-    display: flex;
-    align-items: center;
-  }
-  .modal-close-btn:hover { background: var(--surface-2); color: var(--txt); }
-  .modal-body {
-    padding: 22px;
-    overflow-y: auto;
-  }
-  .modal-footer {
-    padding: 16px 22px;
-    border-top: 1px solid var(--line);
-    background: var(--surface-2);
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 10px;
-  }
+/* Modals */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 20, 16, 0.65);
+  backdrop-filter: blur(5px);
+  z-index: 100;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-backdrop.open { display: flex; animation: fadeIn .15s ease; }
+.modal-box {
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  width: 100%;
+  max-width: 540px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--line);
+  overflow: hidden;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+.modal-box.wide { max-width: 780px; }
+.modal-header {
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.modal-header h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.modal-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--mut);
+  padding: 6px;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+}
+.modal-close-btn:hover { background: var(--surface-2); color: var(--txt); }
+.modal-body {
+  padding: 22px;
+  overflow-y: auto;
+}
+.modal-footer {
+  padding: 16px 22px;
+  border-top: 1px solid var(--line);
+  background: var(--surface-2);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
 
-  /* Dropdown User Menu */
-  .dropdown-menu {
-    position: absolute;
-    top: calc(100% + 8px);
-    right: 24px;
-    width: 230px;
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow);
-    padding: 6px;
-    display: none;
-    z-index: 50;
-    flex-direction: column;
-    gap: 2px;
-  }
-  .dropdown-menu.open { display: flex; animation: fadeIn .15s ease; }
-  .dropdown-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 9px 12px;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--txt);
-    border-radius: var(--radius-md);
-    cursor: pointer;
-    background: transparent;
-    border: none;
-    text-align: left;
-    width: 100%;
-    transition: background .15s ease;
-  }
-  .dropdown-item:hover { background: var(--surface-2); }
-  .dropdown-divider { height: 1px; background: var(--line); margin: 4px 0; }
+/* Dropdown User Menu */
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 24px;
+  width: 230px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 6px;
+  display: none;
+  z-index: 50;
+  flex-direction: column;
+  gap: 2px;
+}
+.dropdown-menu.open { display: flex; animation: fadeIn .15s ease; }
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--txt);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  text-align: left;
+  width: 100%;
+  transition: background .15s ease;
+}
+.dropdown-item:hover { background: var(--surface-2); }
+.dropdown-divider { height: 1px; background: var(--line); margin: 4px 0; }
 
-  /* Toast notification */
-  .toast-container {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    z-index: 200;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    pointer-events: none;
-  }
-  .toast {
-    background: #13251f;
-    color: white;
-    padding: 12px 18px;
-    border-radius: var(--radius-md);
-    font-size: 13.5px;
-    font-weight: 500;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    animation: toastIn .2s ease forwards;
-    pointer-events: auto;
-  }
-  .toast.success { background: #0f6b45; }
-  .toast.error { background: #991b1b; }
-  .toast.warning { background: #92400e; }
-  @keyframes toastIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+/* Toast notification */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+.toast {
+  background: #13251f;
+  color: white;
+  padding: 12px 18px;
+  border-radius: var(--radius-md);
+  font-size: 13.5px;
+  font-weight: 500;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: toastIn .2s ease forwards;
+  pointer-events: auto;
+}
+.toast.success { background: #0f6b45; }
+.toast.error { background: #991b1b; }
+.toast.warning { background: #92400e; }
+@keyframes toastIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 
-  /* Drag and drop zone for CSV */
-  .drop-zone {
-    border: 2px dashed #c1d6c9;
-    border-radius: var(--radius-lg);
-    padding: 28px 20px;
-    text-align: center;
-    background: var(--surface-2);
-    cursor: pointer;
-    transition: all .2s ease;
-  }
-  .drop-zone:hover, .drop-zone.dragover {
-    border-color: var(--g);
-    background: var(--g-light);
-  }
+/* Drag and drop zone for CSV */
+.drop-zone {
+  border: 2px dashed #c1d6c9;
+  border-radius: var(--radius-lg);
+  padding: 28px 20px;
+  text-align: center;
+  background: var(--surface-2);
+  cursor: pointer;
+  transition: all .2s ease;
+}
+.drop-zone:hover, .drop-zone.dragover {
+  border-color: var(--g);
+  background: var(--g-light);
+}
 
-  /* Responsive */
-  @media (max-width: 900px) {
-    .side { transform: translateX(-100%); width: var(--sw); }
-    body.side-open .side { transform: translateX(0); }
-    .main { margin-left: 0 !important; }
-    .topbar { padding: 0 16px; }
-    .content { padding: 16px; }
-  }
+/* Responsive */
+@media (max-width: 900px) {
+  .side { transform: translateX(-100%); width: var(--sw); }
+  body.side-open .side { transform: translateX(0); }
+  .main { margin-left: 0 !important; }
+  .topbar { padding: 0 16px; }
+  .content { padding: 16px; }
+}
+
   </style>
 </head>
 <body>
@@ -1003,7 +1005,8 @@
           <div class="card-head">
             <h2 class="card-title"><svg class="svg-icon"><use href="#icon-calendar"/></svg> Espelho de Ponto Oficial</h2>
             <div style="display:flex; gap:8px;">
-              <button class="btn primary" onclick="openImportModal()"><svg class="svg-icon sm"><use href="#icon-upload"/></svg> Importar Arquivo ("Outubro.csv")</button>
+              <button class="btn primary" onclick="openImportModal()"><svg class="svg-icon sm"><use href="#icon-upload"/></svg> Importar Arquivo (.csv)</button>
+              <button class="btn danger" onclick="handleClearPoint()"><svg class="svg-icon sm"><use href="#icon-trash"/></svg> Limpar Espelho</button>
             </div>
           </div>
           <div class="table-responsive">
@@ -1312,1094 +1315,1274 @@
   <!-- TOAST CONTAINER -->
   <div class="toast-container" id="toastContainer"></div>
 
-  <!-- APPLICATION JAVASCRIPT -->
+  <!-- APPLICATION JAVASCRIPT (CONSOLIDATED STANDALONE) -->
   <script>
-  // SUPABASE CONFIGURATION
-  const SUPABASE_CONFIG = {
-    url: "https://zxkikslpehynkhdyhugq.supabase.co",
-    anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4a2lrc2xwZWh5bmtoZHlodWdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ1Njc5NjYsImV4cCI6MjExMDE0Mzk2Nn0.N_vGKJ7ZT4hiy40Sfa6l_7ZF1PN9oPlK5egZZzchQp0"
-  };
+// Native Supabase REST Client
+const SUPABASE_CONFIG = {
+  url: "https://zxkikslpehynkhdyhugq.supabase.co",
+  anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4a2lrc2xwZWh5bmtoZHlodWdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ1Njc5NjYsImV4cCI6MjExMDE0Mzk2Nn0.N_vGKJ7ZT4hiy40Sfa6l_7ZF1PN9oPlK5egZZzchQp0"
+};
 
-  const $ = id => document.getElementById(id);
-
-  // NATIVE SUPABASE REST CLIENT (100% INDEPENDENT OF EXTERNAL SCRIPTS)
-  class NativeSupabase {
-    constructor(config) {
-      this.url = config.url;
-      this.anonKey = config.anonKey;
-      this.session = JSON.parse(localStorage.getItem('timebank_session') || 'null');
-    }
-
-    getHeaders(auth = true) {
-      const h = {
-        'apikey': this.anonKey,
-        'Content-Type': 'application/json'
-      };
-      if (auth && this.session && this.session.access_token) {
-        h['Authorization'] = 'Bearer ' + this.session.access_token;
-      }
-      return h;
-    }
-
-    async signIn(username, password) {
-      const cleanUser = username.toLowerCase().trim();
-      const email = cleanUser.includes('@') ? cleanUser : cleanUser + '@bancodehoras.app';
-      const res = await fetch(this.url + '/auth/v1/token?grant_type=password', {
-        method: 'POST',
-        headers: this.getHeaders(false),
-        body: JSON.stringify({ email, password })
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error_description || data.msg || data.message || 'Usuário ou senha inválidos.');
-      this.session = data;
-      localStorage.setItem('timebank_session', JSON.stringify(data));
-      return data;
-    }
-
-    async signUp(username, password, fullName, role = 'user') {
-      const cleanUser = username.toLowerCase().trim();
-      const email = cleanUser + '@bancodehoras.app';
-      const res = await fetch(this.url + '/auth/v1/signup', {
-        method: 'POST',
-        headers: this.getHeaders(false),
-        body: JSON.stringify({
-          email,
-          password,
-          data: { username: cleanUser, full_name: fullName, role }
-        })
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.msg || data.message || 'Erro ao criar usuário.');
-      return data;
-    }
-
-    async updatePassword(newPassword) {
-      const res = await fetch(this.url + '/auth/v1/user', {
-        method: 'PUT',
-        headers: this.getHeaders(true),
-        body: JSON.stringify({ password: newPassword })
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || data.msg || 'Erro ao alterar senha.');
-      return data;
-    }
-
-    async signOut() {
-      if (this.session && this.session.access_token) {
-        try {
-          await fetch(this.url + '/auth/v1/logout', { method: 'POST', headers: this.getHeaders(true) });
-        } catch(e) {}
-      }
-      this.session = null;
-      localStorage.removeItem('timebank_session');
-    }
-
-    async select(table, query = '') {
-      const url = `${this.url}/rest/v1/${table}${query ? '?' + query : ''}`;
-      const res = await fetch(url, { method: 'GET', headers: this.getHeaders(true) });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.message || 'Erro ao consultar banco.');
-      }
-      return await res.json();
-    }
-
-    async upsert(table, row) {
-      const res = await fetch(`${this.url}/rest/v1/${table}`, {
-        method: 'POST',
-        headers: {
-          ...this.getHeaders(true),
-          'Prefer': 'resolution=merge-duplicates,return=representation'
-        },
-        body: JSON.stringify(row)
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.message || 'Erro ao gravar registro.');
-      }
-      return await res.json();
-    }
-
-    async delete(table, filter) {
-      const res = await fetch(`${this.url}/rest/v1/${table}?${filter}`, {
-        method: 'DELETE',
-        headers: this.getHeaders(true)
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.message || 'Erro ao excluir.');
-      }
-      return true;
-    }
-
-    async rpc(fn, args = {}) {
-      const res = await fetch(`${this.url}/rest/v1/rpc/${fn}`, {
-        method: 'POST',
-        headers: this.getHeaders(true),
-        body: JSON.stringify(args)
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.message || 'Erro no procedimento.');
-      return data;
-    }
+class NativeSupabase {
+  constructor(config) {
+    this.url = config.url;
+    this.anonKey = config.anonKey;
+    this.session = JSON.parse(localStorage.getItem('timebank_session') || 'null');
   }
 
-  const client = new NativeSupabase(SUPABASE_CONFIG);
-
-  // APPLICATION STATE & OFFLINE MANAGER
-  let currentUser = null;
-  let userProfile = null;
-  let appState = {
-    entries: [],
-    pointEntries: [],
-    planning: [],
-    parsedImportEntries: []
-  };
-
-  // OFFLINE FIRST REPOSITORY
-  const OfflineRepository = {
-    getSnapshotKey: uid => `timebank_snapshot_${uid}`,
-    getQueueKey: uid => `timebank_sync_queue_${uid}`,
-
-    saveSnapshot(uid, state) {
-      try {
-        localStorage.setItem(this.getSnapshotKey(uid), JSON.stringify({
-          entries: state.entries,
-          pointEntries: state.pointEntries,
-          planning: state.planning,
-          timestamp: new Date().toISOString()
-        }));
-      } catch(e) { console.warn("Falha ao gravar cache local", e); }
-    },
-
-    loadSnapshot(uid) {
-      try {
-        const raw = localStorage.getItem(this.getSnapshotKey(uid));
-        return raw ? JSON.parse(raw) : null;
-      } catch(e) { return null; }
-    },
-
-    getQueue(uid) {
-      try {
-        const raw = localStorage.getItem(this.getQueueKey(uid));
-        return raw ? JSON.parse(raw) : [];
-      } catch(e) { return []; }
-    },
-
-    addToQueue(uid, op) {
-      const q = this.getQueue(uid);
-      q.push({ ...op, id: 'op_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5), time: Date.now() });
-      localStorage.setItem(this.getQueueKey(uid), JSON.stringify(q));
-      updateNetworkPill();
-    },
-
-    clearQueue(uid) {
-      localStorage.removeItem(this.getQueueKey(uid));
-      updateNetworkPill();
+  getHeaders(auth = true) {
+    const h = {
+      'apikey': this.anonKey,
+      'Content-Type': 'application/json'
+    };
+    if (auth && this.session && this.session.access_token) {
+      h['Authorization'] = 'Bearer ' + this.session.access_token;
     }
-  };
-
-  // NETWORK & SYNC STATUS LISTENER
-  function updateNetworkPill() {
-    const pill = $('syncStatusPill');
-    const text = $('syncStatusText');
-    if (!pill || !text) return;
-
-    if (!navigator.onLine) {
-      pill.className = 'status-pill offline';
-      text.textContent = 'Modo Offline (dados locais)';
-      return;
-    }
-
-    if (currentUser) {
-      const q = OfflineRepository.getQueue(currentUser.id);
-      if (q.length > 0) {
-        pill.className = 'status-pill syncing';
-        text.textContent = `${q.length} pendente(s) de sincronizar`;
-        return;
-      }
-    }
-
-    pill.className = 'status-pill online';
-    text.textContent = 'Sincronizado';
+    return h;
   }
 
-  window.addEventListener('online', () => {
-    showToast("Conexão com a internet restabelecida! Sincronizando...", "info");
-    manualForceSync();
-  });
-  window.addEventListener('offline', () => {
-    updateNetworkPill();
-    showToast("Sem conexão com a internet. Usando base local offline.", "warning");
-  });
-
-  // PWA SERVICE WORKER REGISTRATION
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js').then(() => {
-        console.log("PWA Service Worker ativo.");
-      }).catch(err => {
-        console.warn("Falha ao registrar Service Worker:", err);
-      });
+  async signIn(username, password) {
+    const cleanUser = username.toLowerCase().trim();
+    const email = cleanUser.includes('@') ? cleanUser : cleanUser + '@bancodehoras.app';
+    const res = await fetch(this.url + '/auth/v1/token?grant_type=password', {
+      method: 'POST',
+      headers: this.getHeaders(false),
+      body: JSON.stringify({ email, password })
     });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error_description || data.msg || data.message || 'Usuário ou senha inválidos.');
+    this.session = data;
+    localStorage.setItem('timebank_session', JSON.stringify(data));
+    return data;
   }
 
-  // TIME ARITHMETIC UTILITIES (TESTED & BULLETPROOF)
-  function parseTime(t) {
-    if (!t || typeof t !== 'string') return null;
-    const parts = t.trim().split(':');
-    if (parts.length < 2) return null;
-    const h = parseInt(parts[0], 10);
-    const m = parseInt(parts[1], 10);
-    if (isNaN(h) || isNaN(m)) return null;
-    return h * 60 + m;
+  async signUp(username, password, fullName, role = 'user') {
+    const cleanUser = username.toLowerCase().trim();
+    const email = cleanUser + '@bancodehoras.app';
+    const res = await fetch(this.url + '/auth/v1/signup', {
+      method: 'POST',
+      headers: this.getHeaders(false),
+      body: JSON.stringify({
+        email,
+        password,
+        data: { username: cleanUser, full_name: fullName, role }
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.msg || data.message || 'Erro ao criar usuário.');
+    return data;
   }
 
-  function formatMinutes(m, withSign = true) {
-    if (m === null || isNaN(m)) return '--:--';
-    const isNeg = m < 0;
-    const abs = Math.abs(m);
-    const hours = Math.floor(abs / 60);
-    const mins = abs % 60;
-    const pad = (n) => String(n).padStart(2, '0');
-    const sign = isNeg ? '-' : (withSign ? '+' : '');
-    return `${sign}${pad(hours)}:${pad(mins)}`;
+  async updatePassword(newPassword) {
+    const res = await fetch(this.url + '/auth/v1/user', {
+      method: 'PUT',
+      headers: this.getHeaders(true),
+      body: JSON.stringify({ password: newPassword })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || data.msg || 'Erro ao alterar senha.');
+    return data;
   }
 
-  function calculateDailyWorked(in1, out1, in2, out2) {
-    const t_in1 = parseTime(in1);
-    const t_out1 = parseTime(out1);
-    const t_in2 = parseTime(in2);
-    const t_out2 = parseTime(out2);
-
-    let total = 0;
-    if (t_in1 !== null && t_out1 !== null && t_out1 >= t_in1) total += (t_out1 - t_in1);
-    if (t_in2 !== null && t_out2 !== null && t_out2 >= t_in2) total += (t_out2 - t_in2);
-    return total;
+  async signOut() {
+    if (this.session && this.session.access_token) {
+      try {
+        await fetch(this.url + '/auth/v1/logout', { method: 'POST', headers: this.getHeaders(true) });
+      } catch(e) {}
+    }
+    this.session = null;
+    localStorage.removeItem('timebank_session');
   }
 
-  function getWeekdayName(dateStr) {
-    if (!dateStr) return '';
-    const parts = dateStr.split('-');
-    if (parts.length < 3) return '';
-    const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-    const days = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
-    return days[d.getDay()] || '';
+  async select(table, query = '') {
+    const url = `${this.url}/rest/v1/${table}${query ? '?' + query : ''}`;
+    const res = await fetch(url, { method: 'GET', headers: this.getHeaders(true) });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || 'Erro ao consultar banco.');
+    }
+    return await res.json();
   }
 
-  function formatDateBR(dateStr) {
-    if (!dateStr) return '';
-    const parts = dateStr.split('-');
-    if (parts.length < 3) return dateStr;
-    return `${parts[2]}/${parts[1]}/${parts[0]}`;
+  async upsert(table, row) {
+    const res = await fetch(`${this.url}/rest/v1/${table}`, {
+      method: 'POST',
+      headers: {
+        ...this.getHeaders(true),
+        'Prefer': 'resolution=merge-duplicates,return=representation'
+      },
+      body: JSON.stringify(row)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || 'Erro ao gravar registro.');
+    }
+    return await res.json();
   }
 
-  // AUTH LOGIC
-  function switchAuthTab(tab) {
-    $('tabLogin').style.borderBottomColor = tab === 'login' ? 'var(--g)' : 'transparent';
-    $('tabLogin').style.color = tab === 'login' ? 'var(--g)' : 'var(--mut)';
-    $('tabRegister').style.borderBottomColor = tab === 'register' ? 'var(--g)' : 'transparent';
-    $('tabRegister').style.color = tab === 'register' ? 'var(--g)' : 'var(--mut)';
-    $('loginForm').style.display = tab === 'login' ? 'flex' : 'none';
-    $('registerForm').style.display = tab === 'register' ? 'flex' : 'none';
-    $('authError').style.display = 'none';
+  async delete(table, filter) {
+    const res = await fetch(`${this.url}/rest/v1/${table}?${filter}`, {
+      method: 'DELETE',
+      headers: this.getHeaders(true)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || 'Erro ao excluir.');
+    }
+    return true;
   }
 
-  async function handleLogin(e) {
-    e.preventDefault();
-    const username = $('loginUsername').value.trim();
-    const password = $('loginPassword').value;
-    const btn = $('btnLoginSubmit');
-    const errBox = $('authError');
+  async rpc(fn, args = {}) {
+    const res = await fetch(`${this.url}/rest/v1/rpc/${fn}`, {
+      method: 'POST',
+      headers: this.getHeaders(true),
+      body: JSON.stringify(args)
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.message || 'Erro no procedimento.');
+    return data;
+  }
+}
 
-    btn.disabled = true;
-    btn.textContent = "Verificando...";
-    errBox.style.display = 'none';
+const client = new NativeSupabase(SUPABASE_CONFIG);
 
+
+// Offline First Manager & Local Storage Snapshot
+const OfflineRepository = {
+  getSnapshotKey: uid => `timebank_snapshot_${uid}`,
+  getQueueKey: uid => `timebank_sync_queue_${uid}`,
+
+  saveSnapshot(uid, state) {
     try {
-      const data = await client.signIn(username, password);
-      showToast("Conectado com sucesso!", "success");
-      await initAuthenticatedSession(data.user);
-    } catch(err) {
-      errBox.textContent = err.message || "Usuário ou senha incorretos.";
-      errBox.style.display = 'block';
-    } finally {
-      btn.disabled = false;
-      btn.textContent = "Acessar Sistema";
-    }
-  }
+      localStorage.setItem(this.getSnapshotKey(uid), JSON.stringify({
+        entries: state.entries,
+        pointEntries: state.pointEntries,
+        planning: state.planning,
+        timestamp: new Date().toISOString()
+      }));
+    } catch(e) { console.warn("Falha ao gravar cache local", e); }
+  },
 
-  async function handleRegister(e) {
-    e.preventDefault();
-    const fullName = $('regFullName').value.trim();
-    const username = $('regUsername').value.trim().toLowerCase();
-    const password = $('regPassword').value;
-    const confirm = $('regPasswordConfirm').value;
-    const btn = $('btnRegSubmit');
-    const errBox = $('authError');
-
-    if (password !== confirm) {
-      errBox.textContent = "As senhas informadas não coincidem.";
-      errBox.style.display = 'block';
-      return;
-    }
-
-    btn.disabled = true;
-    btn.textContent = "Criando usuário...";
-    errBox.style.display = 'none';
-
+  loadSnapshot(uid) {
     try {
-      const res = await client.signUp(username, password, fullName, 'user');
-      showToast("Conta criada com sucesso!", "success");
-      const loginData = await client.signIn(username, password);
-      await initAuthenticatedSession(loginData.user);
-    } catch(err) {
-      errBox.textContent = err.message || "Erro ao criar usuário.";
-      errBox.style.display = 'block';
-    } finally {
-      btn.disabled = false;
-      btn.textContent = "Criar Meu Usuário";
-    }
-  }
+      const raw = localStorage.getItem(this.getSnapshotKey(uid));
+      return raw ? JSON.parse(raw) : null;
+    } catch(e) { return null; }
+  },
 
-  async function handleLogout() {
-    if (!confirm("Deseja realmente sair da sua conta?")) return;
-    await client.signOut();
-    currentUser = null;
-    userProfile = null;
-    $('authBackdrop').classList.add('open');
-    $('userDropdown').classList.remove('open');
-    showToast("Sessão encerrada.", "info");
-  }
-
-  async function initAuthenticatedSession(user) {
-    currentUser = user;
-    $('authBackdrop').classList.remove('open');
-
-    // Load Profile
+  getQueue(uid) {
     try {
-      const profiles = await client.select('timebank_profiles', 'id=eq.' + user.id);
-      userProfile = profiles && profiles[0] ? profiles[0] : {
-        username: user.user_metadata?.username || user.email.split('@')[0],
-        full_name: user.user_metadata?.full_name || 'Usuário',
-        role: user.user_metadata?.role || 'user'
-      };
-    } catch(e) {
-      userProfile = {
-        username: user.user_metadata?.username || 'usuario',
-        full_name: user.user_metadata?.full_name || 'Usuário',
-        role: user.user_metadata?.role || 'user'
-      };
-    }
+      const raw = localStorage.getItem(this.getQueueKey(uid));
+      return raw ? JSON.parse(raw) : [];
+    } catch(e) { return []; }
+  },
 
-    // UI Identity updates
-    const initials = (userProfile.full_name || 'U').split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
-    $('sideAvatar').textContent = initials;
-    $('sideUserName').textContent = userProfile.full_name;
-    $('sideUserRole').textContent = userProfile.role === 'admin' ? 'Administrador' : 'Colaborador';
-    $('topbarUsername').textContent = '@' + userProfile.username;
+  addToQueue(uid, op) {
+    const q = this.getQueue(uid);
+    q.push({ ...op, id: 'op_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5), time: Date.now() });
+    localStorage.setItem(this.getQueueKey(uid), JSON.stringify(q));
+    updateNetworkPill();
+  },
 
-    // Toggle Admin navigation
-    if (userProfile.role === 'admin') {
-      $('adminNavGroup').style.display = 'block';
-    } else {
-      $('adminNavGroup').style.display = 'none';
-    }
-
-    // Set today as default in entry form
-    const today = new Date().toISOString().split('T')[0];
-    if ($('entryDate')) $('entryDate').value = today;
-
-    // Load user data from Supabase / Offline snapshot
-    await loadUserData();
+  clearQueue(uid) {
+    localStorage.removeItem(this.getQueueKey(uid));
     updateNetworkPill();
   }
+};
 
-  // DATA LOADING & OFFLINE RESILIENCE
-  async function loadUserData() {
-    if (!currentUser) return;
+function updateNetworkPill() {
+  const pill = document.getElementById('syncStatusPill');
+  const text = document.getElementById('syncStatusText');
+  if (!pill || !text) return;
 
-    // Try to load offline snapshot first (instant render)
-    const snapshot = OfflineRepository.loadSnapshot(currentUser.id);
-    if (snapshot) {
-      appState.entries = snapshot.entries || [];
-      appState.pointEntries = snapshot.pointEntries || [];
-      appState.planning = snapshot.planning || [];
-      renderAllViews();
+  if (!navigator.onLine) {
+    pill.className = 'status-pill offline';
+    text.textContent = 'Modo Offline (dados locais)';
+    return;
+  }
+
+  if (currentUser) {
+    const q = OfflineRepository.getQueue(currentUser.id);
+    if (q.length > 0) {
+      pill.className = 'status-pill syncing';
+      text.textContent = `${q.length} pendente(s) de sincronizar`;
+      return;
+    }
+  }
+
+  pill.className = 'status-pill online';
+  text.textContent = 'Sincronizado';
+}
+
+window.addEventListener('online', () => {
+  if (typeof showToast === 'function') showToast("Conexão restabelecida! Sincronizando com a nuvem...", "info");
+  if (typeof manualForceSync === 'function') manualForceSync();
+});
+
+window.addEventListener('offline', () => {
+  updateNetworkPill();
+  if (typeof showToast === 'function') showToast("Sem conexão. Utilizando base local offline.", "warning");
+});
+
+
+// Time Arithmetic & Smart CSV Parser ("Outubro.csv")
+function parseTime(t) {
+  if (!t || typeof t !== 'string') return null;
+  const parts = t.trim().split(':');
+  if (parts.length < 2) return null;
+  const h = parseInt(parts[0], 10);
+  const m = parseInt(parts[1], 10);
+  if (isNaN(h) || isNaN(m)) return null;
+  return h * 60 + m;
+}
+
+function formatMinutes(m, withSign = true) {
+  if (m === null || isNaN(m)) return '--:--';
+  const isNeg = m < 0;
+  const abs = Math.abs(m);
+  const hours = Math.floor(abs / 60);
+  const mins = abs % 60;
+  const pad = (n) => String(n).padStart(2, '0');
+  const sign = isNeg ? '-' : (withSign ? '+' : '');
+  return `${sign}${pad(hours)}:${pad(mins)}`;
+}
+
+function calculateDailyWorked(in1, out1, in2, out2) {
+  const t_in1 = parseTime(in1);
+  const t_out1 = parseTime(out1);
+  const t_in2 = parseTime(in2);
+  const t_out2 = parseTime(out2);
+
+  let total = 0;
+  if (t_in1 !== null && t_out1 !== null && t_out1 >= t_in1) total += (t_out1 - t_in1);
+  if (t_in2 !== null && t_out2 !== null && t_out2 >= t_in2) total += (t_out2 - t_in2);
+  return total;
+}
+
+function getWeekdayName(dateStr) {
+  if (!dateStr) return '';
+  const parts = dateStr.split('-');
+  if (parts.length < 3) return '';
+  const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+  const days = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+  return days[d.getDay()] || '';
+}
+
+function formatDateBR(dateStr) {
+  if (!dateStr) return '';
+  const parts = dateStr.split('-');
+  if (parts.length < 3) return dateStr;
+  return `${parts[2]}/${parts[1]}/${parts[0]}`;
+}
+
+function parseTimecardContent(text) {
+  text = text.trim();
+  if (!text) return [];
+
+  // Check JSON
+  if (text.startsWith('{') || text.startsWith('[')) {
+    try {
+      const json = JSON.parse(text);
+      const list = Array.isArray(json) ? json : (json.entries || []);
+      return list.map(it => ({
+        date: it.date,
+        in1: it.in1 || null,
+        out1: it.out1 || null,
+        in2: it.in2 || null,
+        out2: it.out2 || null,
+        double_hours: !!it.double_hours
+      }));
+    } catch(e) {}
+  }
+
+  // CSV / TSV Parsing
+  const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  const results = [];
+  const timeRegex = /\b([01]?\d|2[0-3]):[0-5]\d\b/g;
+  const dateBRRegex = /\b(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})\b/;
+  const dateISORegex = /\b(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})\b/;
+
+  for (const line of lines) {
+    // Ignore metadata and report headers commonly found in Ahgora, Secullum, Senior etc.
+    if (/^(per[ií]odo|emitido|emiss[aã]o|relat[oó]rio|p[aá]gina|cnpj|folha|empresa|colaborador|funcion[aá]rio)/i.test(line)) {
+      continue;
     }
 
-    // If online, fetch fresh data from Supabase
-    if (navigator.onLine) {
-      try {
-        const [entries, pointEntries, planning] = await Promise.all([
-          client.select('timebank_entries', 'user_id=eq.' + currentUser.id + '&order=date.desc'),
-          client.select('timebank_point_entries', 'user_id=eq.' + currentUser.id + '&order=date.desc'),
-          client.select('timebank_planning', 'user_id=eq.' + currentUser.id + '&order=date.asc')
-        ]);
-
-        appState.entries = entries || [];
-        appState.pointEntries = pointEntries || [];
-        appState.planning = planning || [];
-
-        // Save fresh snapshot
-        OfflineRepository.saveSnapshot(currentUser.id, appState);
-        renderAllViews();
-        updateNetworkPill();
-      } catch(err) {
-        console.warn("Falha ao atualizar dados com a nuvem, mantendo snapshot local:", err);
+    let isoDate = null;
+    const matchBR = line.match(dateBRRegex);
+    if (matchBR) {
+      const day = matchBR[1].padStart(2, '0');
+      const month = matchBR[2].padStart(2, '0');
+      let year = matchBR[3];
+      if (year.length === 2) year = '20' + year;
+      isoDate = `${year}-${month}-${day}`;
+    } else {
+      const matchISO = line.match(dateISORegex);
+      if (matchISO) {
+        isoDate = `${matchISO[1]}-${matchISO[2].padStart(2, '0')}-${matchISO[3].padStart(2, '0')}`;
       }
     }
-  }
 
-  // RENDER VIEWS
-  function renderAllViews() {
-    renderDashboard();
-    renderPointTable();
-    renderPlanningTable();
-    if (userProfile && userProfile.role === 'admin') {
-      loadAdminUsers();
+    if (!isoDate) continue;
+
+    const times = line.match(timeRegex) || [];
+    if (times.length === 0) continue;
+
+    // Prevent duplicate entries for the same date from the same file
+    const existingIdx = results.findIndex(it => it.date === isoDate);
+    const entryData = {
+      date: isoDate,
+      in1: times[0] || null,
+      out1: times[1] || null,
+      in2: times[2] || null,
+      out2: times[3] || null,
+      double_hours: false
+    };
+
+    if (existingIdx >= 0) {
+      results[existingIdx] = entryData;
+    } else {
+      results.push(entryData);
     }
   }
 
-  function renderDashboard() {
-    const tbody = $('entriesTableBody');
-    if (!tbody) return;
+  // Sort by date ascending
+  results.sort((a, b) => a.date.localeCompare(b.date));
+  return results;
+}
 
-    if (appState.entries.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:28px; color:var(--mut);">Nenhum lançamento registrado ainda. Adicione acima ou importe o cartão ponto.</td></tr>';
-      updateKPIs(0, 0, 0);
-      return;
-    }
 
-    let totalSaldoMinutes = 0;
-    let mesSaldoMinutes = 0;
-    const currentMonth = new Date().toISOString().slice(0, 7);
+// Main Application Logic
+const $ = id => document.getElementById(id);
 
-    tbody.innerHTML = appState.entries.map(e => {
-      const worked = calculateDailyWorked(e.in1, e.out1, e.in2, e.out2);
-      const standard = 8 * 60; // 8 hours standard
-      const saldo = e.double_hours ? (worked * 2 - standard) : (worked - standard);
-      totalSaldoMinutes += saldo;
-      if (e.date.startsWith(currentMonth)) mesSaldoMinutes += saldo;
+let currentUser = null;
+let userProfile = null;
+let appState = {
+  entries: [],
+  pointEntries: [],
+  planning: [],
+  parsedImportEntries: []
+};
 
-      const isPos = saldo >= 0;
-      const saldoBadge = `<span class="badge ${isPos ? 'positive' : 'negative'}">${formatMinutes(saldo)}</span>`;
-      const weekday = getWeekdayName(e.date);
+// PWA SERVICE WORKER REGISTRATION
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').then(() => {
+      console.log("PWA Service Worker ativo.");
+    }).catch(err => {
+      console.warn("Falha ao registrar Service Worker:", err);
+    });
+  });
+}
 
-      return `
-        <tr>
-          <td><b>${formatDateBR(e.date)}</b></td>
-          <td style="color:var(--mut); font-size:12px;">${weekday}</td>
-          <td>${e.in1 || '--:--'}</td>
-          <td>${e.out1 || '--:--'}</td>
-          <td>${e.in2 || '--:--'}</td>
-          <td>${e.out2 || '--:--'}</td>
-          <td>${formatMinutes(worked, false)}</td>
-          <td>${saldoBadge}</td>
-          <td>
-            <button class="btn secondary icon-only" onclick="deleteEntry('${e.date}')" title="Excluir lançamento">
-              <svg class="svg-icon sm" style="stroke:var(--red);"><use href="#icon-trash"/></svg>
-            </button>
-          </td>
-        </tr>
-      `;
-    }).join('');
+// AUTH HANDLERS
+function switchAuthTab(tab) {
+  $('tabLogin').style.borderBottomColor = tab === 'login' ? 'var(--g)' : 'transparent';
+  $('tabLogin').style.color = tab === 'login' ? 'var(--g)' : 'var(--mut)';
+  $('tabRegister').style.borderBottomColor = tab === 'register' ? 'var(--g)' : 'transparent';
+  $('tabRegister').style.color = tab === 'register' ? 'var(--g)' : 'var(--mut)';
+  $('loginForm').style.display = tab === 'login' ? 'flex' : 'none';
+  $('registerForm').style.display = tab === 'register' ? 'flex' : 'none';
+  $('authError').style.display = 'none';
+}
 
-    updateKPIs(totalSaldoMinutes, mesSaldoMinutes, appState.entries.length);
+async function handleLogin(e) {
+  e.preventDefault();
+  const username = $('loginUsername').value.trim();
+  const password = $('loginPassword').value;
+  const btn = $('btnLoginSubmit');
+  const errBox = $('authError');
+
+  btn.disabled = true;
+  btn.textContent = "Verificando...";
+  errBox.style.display = 'none';
+
+  try {
+    const data = await client.signIn(username, password);
+    showToast("Conectado com sucesso!", "success");
+    await initAuthenticatedSession(data.user);
+  } catch(err) {
+    errBox.textContent = err.message || "Usuário ou senha incorretos.";
+    errBox.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Acessar Sistema";
+  }
+}
+
+async function handleRegister(e) {
+  e.preventDefault();
+  const fullName = $('regFullName').value.trim();
+  const username = $('regUsername').value.trim().toLowerCase();
+  const password = $('regPassword').value;
+  const confirm = $('regPasswordConfirm').value;
+  const btn = $('btnRegSubmit');
+  const errBox = $('authError');
+
+  if (password !== confirm) {
+    errBox.textContent = "As senhas informadas não coincidem.";
+    errBox.style.display = 'block';
+    return;
   }
 
-  function updateKPIs(totalSaldo, mesSaldo, count) {
-    const kpiTotal = $('kpiSaldoTotal');
-    const kpiMes = $('kpiSaldoMes');
-    const kpiCount = $('kpiCountLancamentos');
-    const kpiCred = $('kpiCreditosPonto');
+  btn.disabled = true;
+  btn.textContent = "Criando usuário...";
+  errBox.style.display = 'none';
 
-    if (kpiTotal) {
-      kpiTotal.textContent = formatMinutes(totalSaldo);
-      kpiTotal.style.color = totalSaldo >= 0 ? 'var(--g)' : 'var(--red)';
-    }
-    if (kpiMes) {
-      kpiMes.textContent = formatMinutes(mesSaldo);
-      kpiMes.style.color = mesSaldo >= 0 ? 'var(--g)' : 'var(--red)';
-    }
-    if (kpiCount) kpiCount.textContent = count;
-    if (kpiCred) kpiCred.textContent = appState.pointEntries.length;
+  try {
+    const res = await client.signUp(username, password, fullName, 'user');
+    showToast("Conta criada com sucesso!", "success");
+    const loginData = await client.signIn(username, password);
+    await initAuthenticatedSession(loginData.user);
+  } catch(err) {
+    errBox.textContent = err.message || "Erro ao criar usuário.";
+    errBox.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Criar Meu Usuário";
+  }
+}
+
+async function handleLogout() {
+  if (!confirm("Deseja realmente sair da sua conta?")) return;
+  await client.signOut();
+  currentUser = null;
+  userProfile = null;
+  $('authBackdrop').classList.add('open');
+  $('userDropdown').classList.remove('open');
+  showToast("Sessão encerrada.", "info");
+}
+
+async function initAuthenticatedSession(user) {
+  currentUser = user;
+  $('authBackdrop').classList.remove('open');
+
+  try {
+    const profiles = await client.select('timebank_profiles', 'id=eq.' + user.id);
+    userProfile = profiles && profiles[0] ? profiles[0] : {
+      username: user.user_metadata?.username || user.email.split('@')[0],
+      full_name: user.user_metadata?.full_name || 'Usuário',
+      role: user.user_metadata?.role || 'user'
+    };
+  } catch(e) {
+    userProfile = {
+      username: user.user_metadata?.username || 'usuario',
+      full_name: user.user_metadata?.full_name || 'Usuário',
+      role: user.user_metadata?.role || 'user'
+    };
   }
 
-  function renderPointTable() {
-    const tbody = $('pointTableBody');
-    if (!tbody) return;
+  const initials = (userProfile.full_name || 'U').split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+  $('sideAvatar').textContent = initials;
+  $('sideUserName').textContent = userProfile.full_name;
+  $('sideUserRole').textContent = userProfile.role === 'admin' ? 'Administrador' : 'Colaborador';
+  $('topbarUsername').textContent = '@' + userProfile.username;
 
-    if (appState.pointEntries.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:28px; color:var(--mut);">Nenhum arquivo de cartão ponto importado ainda. Clique em "Importar Arquivo".</td></tr>';
-      return;
-    }
-
-    tbody.innerHTML = appState.pointEntries.map(p => {
-      const batidas = [p.in1, p.out1, p.in2, p.out2].filter(Boolean).join(' • ') || 'Sem batidas';
-      const worked = calculateDailyWorked(p.in1, p.out1, p.in2, p.out2);
-      const standard = 8 * 60;
-      const saldo = worked - standard;
-      const isPos = saldo >= 0;
-
-      return `
-        <tr>
-          <td><b>${formatDateBR(p.date)}</b></td>
-          <td style="color:var(--mut); font-size:12px;">${getWeekdayName(p.date)}</td>
-          <td><span style="font-family:monospace; font-size:12.5px;">${batidas}</span></td>
-          <td>${formatMinutes(worked, false)}</td>
-          <td><span class="badge ${isPos ? 'positive' : 'negative'}">${formatMinutes(saldo)}</span></td>
-          <td><span class="badge neutral">${p.status || 'Importado'}</span></td>
-          <td>
-            <button class="btn secondary" style="padding:4px 8px; font-size:11.5px;" onclick="convertPointToEntry('${p.date}')">
-              Lançar no Banco
-            </button>
-          </td>
-        </tr>
-      `;
-    }).join('');
+  if (userProfile.role === 'admin') {
+    $('adminNavGroup').style.display = 'block';
+  } else {
+    $('adminNavGroup').style.display = 'none';
   }
 
-  function renderPlanningTable() {
-    const tbody = $('planTableBody');
-    if (!tbody) return;
+  const today = new Date().toISOString().split('T')[0];
+  if ($('entryDate')) $('entryDate').value = today;
 
-    if (appState.planning.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:var(--mut);">Nenhuma meta ou folga planejada.</td></tr>';
-      return;
+  await loadUserData();
+  updateNetworkPill();
+}
+
+// DATA LOADING & OFFLINE RESILIENCE
+async function loadUserData() {
+  if (!currentUser) return;
+
+  const snapshot = OfflineRepository.loadSnapshot(currentUser.id);
+  if (snapshot) {
+    appState.entries = snapshot.entries || [];
+    appState.pointEntries = snapshot.pointEntries || [];
+    appState.planning = snapshot.planning || [];
+    renderAllViews();
+  }
+
+  if (navigator.onLine) {
+    try {
+      const [entries, pointEntries, planning] = await Promise.all([
+        client.select('timebank_entries', 'user_id=eq.' + currentUser.id + '&order=date.desc'),
+        client.select('timebank_point_entries', 'user_id=eq.' + currentUser.id + '&order=date.desc'),
+        client.select('timebank_planning', 'user_id=eq.' + currentUser.id + '&order=date.asc')
+      ]);
+
+      appState.entries = entries || [];
+      appState.pointEntries = pointEntries || [];
+      appState.planning = planning || [];
+
+      OfflineRepository.saveSnapshot(currentUser.id, appState);
+      renderAllViews();
+      updateNetworkPill();
+    } catch(err) {
+      console.warn("Nuvem inacessível temporariamente, operando em cache local:", err);
     }
+  }
+}
 
-    tbody.innerHTML = appState.planning.map((pl, idx) => `
+// RENDER ALL VIEWS
+function renderAllViews() {
+  renderDashboard();
+  renderPointTable();
+  renderPlanningTable();
+  if (userProfile && userProfile.role === 'admin') {
+    loadAdminUsers();
+  }
+}
+
+function renderDashboard() {
+  const tbody = $('entriesTableBody');
+  if (!tbody) return;
+
+  if (appState.entries.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:28px; color:var(--mut);">Nenhum lançamento registrado ainda. Adicione acima ou importe o cartão ponto.</td></tr>';
+    updateKPIs(0, 0, 0);
+    return;
+  }
+
+  let totalSaldoMinutes = 0;
+  let mesSaldoMinutes = 0;
+  const currentMonth = new Date().toISOString().slice(0, 7);
+  const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+  const now = new Date();
+  if ($('kpiNomeMes')) $('kpiNomeMes').textContent = `${monthNames[now.getMonth()]} / ${now.getFullYear()}`;
+
+  tbody.innerHTML = appState.entries.map(e => {
+    const worked = calculateDailyWorked(e.in1, e.out1, e.in2, e.out2);
+    const standard = 8 * 60;
+    const saldo = e.double_hours ? (worked * 2 - standard) : (worked - standard);
+    totalSaldoMinutes += saldo;
+    if (e.date.startsWith(currentMonth)) mesSaldoMinutes += saldo;
+
+    const isPos = saldo >= 0;
+    const saldoBadge = `<span class="badge ${isPos ? 'positive' : 'negative'}">${formatMinutes(saldo)}</span>`;
+    const weekday = getWeekdayName(e.date);
+
+    return `
       <tr>
-        <td><b>${formatDateBR(pl.date)}</b></td>
-        <td><span class="badge neutral">${pl.type || 'Meta'}</span></td>
-        <td>${pl.hours} horas</td>
+        <td><b>${formatDateBR(e.date)}</b></td>
+        <td style="color:var(--mut); font-size:12px;">${weekday}</td>
+        <td>${e.in1 || '--:--'}</td>
+        <td>${e.out1 || '--:--'}</td>
+        <td>${e.in2 || '--:--'}</td>
+        <td>${e.out2 || '--:--'}</td>
+        <td>${formatMinutes(worked, false)}</td>
+        <td>${saldoBadge}</td>
         <td>
-          <button class="btn secondary icon-only" onclick="deletePlan('${pl.id || idx}')" title="Excluir">
+          <button class="btn secondary icon-only" onclick="deleteEntry('${e.date}')" title="Excluir lançamento">
             <svg class="svg-icon sm" style="stroke:var(--red);"><use href="#icon-trash"/></svg>
           </button>
         </td>
       </tr>
-    `).join('');
+    `;
+  }).join('');
+
+  updateKPIs(totalSaldoMinutes, mesSaldoMinutes, appState.entries.length);
+}
+
+function updateKPIs(totalSaldo, mesSaldo, count) {
+  const kpiTotal = $('kpiSaldoTotal');
+  const kpiMes = $('kpiSaldoMes');
+  const kpiCount = $('kpiCountLancamentos');
+  const kpiCred = $('kpiCreditosPonto');
+
+  if (kpiTotal) {
+    kpiTotal.textContent = formatMinutes(totalSaldo);
+    kpiTotal.style.color = totalSaldo >= 0 ? 'var(--g)' : 'var(--red)';
+  }
+  if (kpiMes) {
+    kpiMes.textContent = formatMinutes(mesSaldo);
+    kpiMes.style.color = mesSaldo >= 0 ? 'var(--g)' : 'var(--red)';
+  }
+  if (kpiCount) kpiCount.textContent = count;
+  if (kpiCred) kpiCred.textContent = appState.pointEntries.length;
+}
+
+function renderPointTable() {
+  const tbody = $('pointTableBody');
+  if (!tbody) return;
+
+  if (appState.pointEntries.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:28px; color:var(--mut);">Nenhum arquivo de cartão ponto importado ainda. Clique em "Importar Arquivo".</td></tr>';
+    return;
   }
 
-  // CRUD FOR ENTRIES (OFFLINE FIRST WITH QUEUE)
-  async function handleSaveEntry(e) {
-    e.preventDefault();
-    if (!currentUser) return;
+  tbody.innerHTML = appState.pointEntries.map(p => {
+    const batidas = [p.in1, p.out1, p.in2, p.out2].filter(Boolean).join(' • ') || 'Sem batidas';
+    const worked = calculateDailyWorked(p.in1, p.out1, p.in2, p.out2);
+    const standard = 8 * 60;
+    const saldo = worked - standard;
+    const isPos = saldo >= 0;
 
-    const date = $('entryDate').value;
-    const in1 = $('entryIn1').value || null;
-    const out1 = $('entryOut1').value || null;
-    const in2 = $('entryIn2').value || null;
-    const out2 = $('entryOut2').value || null;
-    const double_hours = $('entryDouble').value === 'true';
-
-    const newRecord = {
-      user_id: currentUser.id,
-      date,
-      in1,
-      out1,
-      in2,
-      out2,
-      double_hours,
-      status: 'Registrado',
-      source: 'manual'
-    };
-
-    // Optimistic local update
-    const existingIdx = appState.entries.findIndex(it => it.date === date);
-    if (existingIdx >= 0) appState.entries[existingIdx] = newRecord;
-    else appState.entries.unshift(newRecord);
-    appState.entries.sort((a, b) => b.date.localeCompare(a.date));
-
-    OfflineRepository.saveSnapshot(currentUser.id, appState);
-    renderDashboard();
-    showToast("Lançamento gravado!", "success");
-
-    // Network sync or queue
-    if (navigator.onLine) {
-      try {
-        await client.upsert('timebank_entries', newRecord);
-      } catch(err) {
-        OfflineRepository.addToQueue(currentUser.id, { action: 'upsert', table: 'timebank_entries', data: newRecord });
-      }
-    } else {
-      OfflineRepository.addToQueue(currentUser.id, { action: 'upsert', table: 'timebank_entries', data: newRecord });
-    }
-  }
-
-  async function deleteEntry(date) {
-    if (!confirm(`Deseja excluir o lançamento do dia ${formatDateBR(date)}?`)) return;
-    if (!currentUser) return;
-
-    // Optimistic local removal
-    appState.entries = appState.entries.filter(it => it.date !== date);
-    OfflineRepository.saveSnapshot(currentUser.id, appState);
-    renderDashboard();
-    showToast("Lançamento removido.", "info");
-
-    // Network delete or queue
-    const filter = `user_id=eq.${currentUser.id}&date=eq.${date}`;
-    if (navigator.onLine) {
-      try {
-        await client.delete('timebank_entries', filter);
-      } catch(err) {
-        OfflineRepository.addToQueue(currentUser.id, { action: 'delete', table: 'timebank_entries', filter });
-      }
-    } else {
-      OfflineRepository.addToQueue(currentUser.id, { action: 'delete', table: 'timebank_entries', filter });
-    }
-  }
-
-  async function handleClearAll() {
-    if (!confirm("ATENÇÃO: Deseja apagar TODOS os seus lançamentos da base? Esta ação é irreversível.")) return;
-    if (!currentUser) return;
-
-    appState.entries = [];
-    appState.pointEntries = [];
-    appState.planning = [];
-    OfflineRepository.saveSnapshot(currentUser.id, appState);
-    renderAllViews();
-    showToast("Todos os registros locais foram limpos.", "info");
-
-    if (navigator.onLine) {
-      try {
-        await client.delete('timebank_entries', 'user_id=eq.' + currentUser.id);
-        await client.delete('timebank_point_entries', 'user_id=eq.' + currentUser.id);
-        await client.delete('timebank_planning', 'user_id=eq.' + currentUser.id);
-      } catch(e) {}
-    }
-  }
-
-  // SMART CSV / TSV / JSON TIME CARD PARSER ("Outubro.csv")
-  function openImportModal() {
-    $('importModal').classList.add('open');
-    $('importPreviewArea').style.display = 'none';
-    $('btnConfirmImport').disabled = true;
-    appState.parsedImportEntries = [];
-  }
-  function closeImportModal() { $('importModal').classList.remove('open'); }
-
-  function handleDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('dragover'); }
-  function handleDragLeave(e) { e.currentTarget.classList.remove('dragover'); }
-  function handleDrop(e) {
-    e.preventDefault();
-    e.currentTarget.classList.remove('dragover');
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      readFile(e.dataTransfer.files[0]);
-    }
-  }
-  function handleFileSelect(e) {
-    if (e.target.files && e.target.files[0]) readFile(e.target.files[0]);
-  }
-  function readFile(file) {
-    const r = new FileReader();
-    r.onload = ev => {
-      $('importRawText').value = ev.target.result;
-      parseRawInput();
-    };
-    r.readAsText(file);
-  }
-
-  function parseRawInput() {
-    const text = $('importRawText').value.trim();
-    if (!text) return alert("Selecione um arquivo ou cole o conteúdo do cartão ponto.");
-
-    // Check if JSON
-    if (text.startsWith('{') || text.startsWith('[')) {
-      try {
-        const json = JSON.parse(text);
-        const list = Array.isArray(json) ? json : (json.entries || []);
-        appState.parsedImportEntries = list.map(it => ({
-          date: it.date,
-          in1: it.in1 || null,
-          out1: it.out1 || null,
-          in2: it.in2 || null,
-          out2: it.out2 || null,
-          double_hours: !!it.double_hours
-        }));
-        renderImportPreview();
-        return;
-      } catch(e) {}
-    }
-
-    // CSV / TSV Intelligent Parser
-    const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
-    const results = [];
-    const timeRegex = /\b([01]?\d|2[0-3]):[0-5]\d\b/g;
-    const dateBRRegex = /\b(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})\b/;
-    const dateISORegex = /\b(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})\b/;
-
-    for (const line of lines) {
-      // Find date
-      let isoDate = null;
-      const matchBR = line.match(dateBRRegex);
-      if (matchBR) {
-        const day = matchBR[1].padStart(2, '0');
-        const month = matchBR[2].padStart(2, '0');
-        let year = matchBR[3];
-        if (year.length === 2) year = '20' + year;
-        isoDate = `${year}-${month}-${day}`;
-      } else {
-        const matchISO = line.match(dateISORegex);
-        if (matchISO) {
-          isoDate = `${matchISO[1]}-${matchISO[2].padStart(2, '0')}-${matchISO[3].padStart(2, '0')}`;
-        }
-      }
-
-      if (!isoDate) continue;
-
-      // Find all punches
-      const times = line.match(timeRegex) || [];
-      if (times.length === 0) continue;
-
-      results.push({
-        date: isoDate,
-        in1: times[0] || null,
-        out1: times[1] || null,
-        in2: times[2] || null,
-        out2: times[3] || null,
-        double_hours: false
-      });
-    }
-
-    if (results.length === 0) {
-      alert("Nenhum dia de ponto com horários válidos foi detectado no arquivo. Verifique o formato.");
-      return;
-    }
-
-    appState.parsedImportEntries = results;
-    renderImportPreview();
-  }
-
-  function renderImportPreview() {
-    const list = appState.parsedImportEntries;
-    $('importCountBadge').textContent = `${list.length} dias identificados`;
-    $('importPreviewArea').style.display = 'block';
-    $('btnConfirmImport').disabled = false;
-
-    const tbody = $('importPreviewBody');
-    tbody.innerHTML = list.slice(0, 31).map(it => {
-      const worked = calculateDailyWorked(it.in1, it.out1, it.in2, it.out2);
-      const saldo = worked - (8 * 60);
-      return `
-        <tr>
-          <td><b>${formatDateBR(it.date)}</b></td>
-          <td>${it.in1 || '--:--'}</td>
-          <td>${it.out1 || '--:--'}</td>
-          <td>${it.in2 || '--:--'}</td>
-          <td>${it.out2 || '--:--'}</td>
-          <td>${formatMinutes(worked, false)}</td>
-          <td><span class="badge ${saldo >= 0 ? 'positive' : 'negative'}">${formatMinutes(saldo)}</span></td>
-        </tr>
-      `;
-    }).join('');
-  }
-
-  async function executeImport() {
-    if (!currentUser || appState.parsedImportEntries.length === 0) return;
-    const btn = $('btnConfirmImport');
-    btn.disabled = true;
-    btn.textContent = "Sincronizando...";
-
-    const entriesToSave = appState.parsedImportEntries.map(it => ({
-      user_id: currentUser.id,
-      date: it.date,
-      in1: it.in1,
-      out1: it.out1,
-      in2: it.in2,
-      out2: it.out2,
-      double_hours: it.double_hours,
-      status: 'Importado de Cartão Ponto',
-      source: 'csv_import'
-    }));
-
-    // Merge into local state
-    for (const item of entriesToSave) {
-      const idx = appState.entries.findIndex(e => e.date === item.date);
-      if (idx >= 0) appState.entries[idx] = item;
-      else appState.entries.push(item);
-    }
-    appState.entries.sort((a, b) => b.date.localeCompare(a.date));
-    OfflineRepository.saveSnapshot(currentUser.id, appState);
-    renderAllViews();
-
-    closeImportModal();
-    showToast(`${entriesToSave.length} dias importados com sucesso!`, "success");
-
-    // Cloud batch upsert
-    if (navigator.onLine) {
-      for (const item of entriesToSave) {
-        try {
-          await client.upsert('timebank_entries', item);
-        } catch(e) {
-          OfflineRepository.addToQueue(currentUser.id, { action: 'upsert', table: 'timebank_entries', data: item });
-        }
-      }
-    } else {
-      for (const item of entriesToSave) {
-        OfflineRepository.addToQueue(currentUser.id, { action: 'upsert', table: 'timebank_entries', data: item });
-      }
-    }
-    btn.disabled = false;
-    btn.textContent = "Confirmar e Sincronizar";
-  }
-
-  // EXPORT CSV
-  function exportCSV() {
-    if (appState.entries.length === 0) return alert("Não há lançamentos para exportar.");
-    const header = "Data;Dia;Entrada 1;Saida 1;Entrada 2;Saida 2;Horas Trabalhadas;Saldo Minutos;Saldo Formatado\n";
-    const rows = appState.entries.map(e => {
-      const worked = calculateDailyWorked(e.in1, e.out1, e.in2, e.out2);
-      const saldo = worked - (8 * 60);
-      return `${formatDateBR(e.date)};${getWeekdayName(e.date)};${e.in1 || ''};${e.out1 || ''};${e.in2 || ''};${e.out2 || ''};${formatMinutes(worked, false)};${saldo};${formatMinutes(saldo)}`;
-    }).join('\n');
-
-    const blob = new Blob([header + rows], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `banco_de_horas_${userProfile ? userProfile.username : 'export'}.csv`;
-    a.click();
-    showToast("Arquivo CSV baixado!", "success");
-  }
-
-  // USER SELF-SERVICE PASSWORD CHANGE
-  function openChangePasswordModal() {
-    $('changePasswordModal').classList.add('open');
-    $('userDropdown').classList.remove('open');
-    $('selfNewPassword').value = '';
-    $('selfConfirmPassword').value = '';
-  }
-  function closeChangePasswordModal() { $('changePasswordModal').classList.remove('open'); }
-
-  async function handleSelfPasswordChange(e) {
-    e.preventDefault();
-    const p1 = $('selfNewPassword').value;
-    const p2 = $('selfConfirmPassword').value;
-    if (p1 !== p2) return alert("As senhas informadas não conferem.");
-    if (p1.length < 6) return alert("A senha deve ter no mínimo 6 caracteres.");
-
-    try {
-      await client.updatePassword(p1);
-      closeChangePasswordModal();
-      showToast("Sua senha foi alterada com sucesso!", "success");
-    } catch(err) {
-      alert("Erro ao alterar senha: " + err.message);
-    }
-  }
-
-  // ADMIN CONTROLS (DEDICATED ADMIN TAB)
-  let adminUsersList = [];
-  async function loadAdminUsers() {
-    if (!currentUser || (userProfile && userProfile.role !== 'admin')) return;
-    try {
-      const users = await client.rpc('admin_list_users', {});
-      adminUsersList = users || [];
-      renderAdminUsersTable(adminUsersList);
-
-      $('admKpiUsers').textContent = adminUsersList.length;
-      $('admKpiAdmins').textContent = adminUsersList.filter(u => u.role === 'admin').length;
-      const totalGlobalEntries = adminUsersList.reduce((acc, u) => acc + (parseInt(u.entries_count) || 0), 0);
-      $('admKpiEntries').textContent = totalGlobalEntries;
-    } catch(err) {
-      console.warn("Falha ao carregar lista de usuários admin:", err);
-    }
-  }
-
-  function renderAdminUsersTable(users) {
-    const tbody = $('admUsersTableBody');
-    if (!tbody) return;
-
-    if (users.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:24px; color:var(--mut);">Nenhum usuário encontrado.</td></tr>';
-      return;
-    }
-
-    tbody.innerHTML = users.map(u => `
+    return `
       <tr>
-        <td><b>@${u.username}</b></td>
-        <td>${u.full_name || 'Sem nome'}</td>
-        <td><span class="badge ${u.role === 'admin' ? 'admin' : 'user'}">${u.role === 'admin' ? 'Administrador' : 'Colaborador'}</span></td>
-        <td style="color:var(--mut); font-size:12px;">${formatDateBR(u.created_at.split('T')[0])}</td>
-        <td><b>${u.entries_count || 0}</b> lançamentos</td>
+        <td><b>${formatDateBR(p.date)}</b></td>
+        <td style="color:var(--mut); font-size:12px;">${getWeekdayName(p.date)}</td>
+        <td><span style="font-family:monospace; font-size:12.5px;">${batidas}</span></td>
+        <td>${formatMinutes(worked, false)}</td>
+        <td><span class="badge ${isPos ? 'positive' : 'negative'}">${formatMinutes(saldo)}</span></td>
+        <td><span class="badge neutral">${p.status || 'Importado'}</span></td>
         <td>
           <div style="display:flex; gap:6px;">
-            <button class="btn secondary icon-only" onclick="openAdminResetModal('${u.user_id}', '${u.username}')" title="Redefinir senha">
-              <svg class="svg-icon sm"><use href="#icon-key"/></svg>
+            <button class="btn secondary" style="padding:4px 8px; font-size:11.5px;" onclick="convertPointToEntry('${p.date}')">
+              Lançar no Banco
             </button>
-            ${u.username !== 'admin' && u.username !== (userProfile ? userProfile.username : '') ? `
-              <button class="btn danger icon-only" onclick="handleAdminDeleteUser('${u.user_id}', '${u.username}')" title="Excluir usuário">
-                <svg class="svg-icon sm"><use href="#icon-trash"/></svg>
-              </button>
-            ` : ''}
+            <button class="btn secondary icon-only" onclick="deletePointEntry('${p.date}')" title="Excluir do espelho">
+              <svg class="svg-icon sm" style="stroke:var(--red);"><use href="#icon-trash"/></svg>
+            </button>
           </div>
         </td>
       </tr>
-    `).join('');
+    `;
+  }).join('');
+}
+
+async function convertPointToEntry(date) {
+  if (!currentUser) return;
+  const p = appState.pointEntries.find(it => it.date === date);
+  if (!p) {
+    showToast("Registro de ponto não encontrado.", "error");
+    return;
   }
 
-  function filterAdminUsers() {
-    const q = $('admUserSearch').value.toLowerCase().trim();
-    const filtered = adminUsersList.filter(u => u.username.toLowerCase().includes(q) || (u.full_name && u.full_name.toLowerCase().includes(q)));
-    renderAdminUsersTable(filtered);
-  }
+  const newRecord = {
+    user_id: currentUser.id,
+    date: p.date,
+    in1: p.in1 || null,
+    out1: p.out1 || null,
+    in2: p.in2 || null,
+    out2: p.out2 || null,
+    double_hours: false,
+    status: 'Importado de Cartão Ponto',
+    source: 'point_card'
+  };
 
-  async function handleAdminCreateUser(e) {
-    e.preventDefault();
-    const fullName = $('admNewFullName').value.trim();
-    const username = $('admNewUsername').value.trim().toLowerCase();
-    const password = $('admNewPassword').value;
-    const role = $('admNewRole').value;
+  const existingIdx = appState.entries.findIndex(e => e.date === date);
+  if (existingIdx >= 0) appState.entries[existingIdx] = newRecord;
+  else appState.entries.unshift(newRecord);
+  appState.entries.sort((a, b) => b.date.localeCompare(a.date));
 
+  OfflineRepository.saveSnapshot(currentUser.id, appState);
+  renderAllViews();
+  showToast(`Dia ${formatDateBR(date)} lançado no Banco de Horas!`, "success");
+
+  if (navigator.onLine) {
     try {
-      await client.signUp(username, password, fullName, role);
-      showToast(`Usuário @${username} criado com sucesso!`, "success");
-      $('admNewFullName').value = '';
-      $('admNewUsername').value = '';
-      $('admNewPassword').value = '';
-      await loadAdminUsers();
+      await client.upsert('timebank_entries', newRecord);
     } catch(err) {
-      alert("Erro ao criar usuário: " + err.message);
+      OfflineRepository.addToQueue(currentUser.id, { action: 'upsert', table: 'timebank_entries', data: newRecord });
     }
+  } else {
+    OfflineRepository.addToQueue(currentUser.id, { action: 'upsert', table: 'timebank_entries', data: newRecord });
   }
+}
 
-  function openAdminResetModal(userId, username) {
-    $('admResetModal').classList.add('open');
-    $('admResetUserId').value = userId;
-    $('admResetUserName').value = '@' + username;
-    $('admResetNewPass').value = '';
-  }
-  function closeAdminResetModal() { $('admResetModal').classList.remove('open'); }
+async function deletePointEntry(date) {
+  if (!confirm(`Deseja remover o ponto do dia ${formatDateBR(date)} do espelho?`)) return;
+  if (!currentUser) return;
 
-  async function handleConfirmAdminReset(e) {
-    e.preventDefault();
-    const userId = $('admResetUserId').value;
-    const newPass = $('admResetNewPass').value;
-    if (newPass.length < 6) return alert("A senha deve ter no mínimo 6 caracteres.");
+  appState.pointEntries = appState.pointEntries.filter(it => it.date !== date);
+  OfflineRepository.saveSnapshot(currentUser.id, appState);
+  renderPointTable();
+  if ($('kpiCreditosPonto')) $('kpiCreditosPonto').textContent = appState.pointEntries.length;
+  showToast("Registro removido do espelho de ponto.", "info");
 
+  const filter = `user_id=eq.${currentUser.id}&date=eq.${date}`;
+  if (navigator.onLine) {
     try {
-      await client.rpc('admin_reset_password', { target_user_id: userId, new_password: newPass });
-      closeAdminResetModal();
-      showToast("Senha redefinida com sucesso!", "success");
+      await client.delete('timebank_point_entries', filter);
     } catch(err) {
-      alert("Erro ao redefinir senha: " + err.message);
+      OfflineRepository.addToQueue(currentUser.id, { action: 'delete', table: 'timebank_point_entries', filter });
     }
+  } else {
+    OfflineRepository.addToQueue(currentUser.id, { action: 'delete', table: 'timebank_point_entries', filter });
   }
+}
 
-  async function handleAdminDeleteUser(userId, username) {
-    if (!confirm(`Tem certeza absoluta de que deseja excluir o usuário @${username} e todos os seus lançamentos?`)) return;
+async function handleClearPoint() {
+  if (appState.pointEntries.length === 0) return alert("Não há registros de ponto importados para limpar.");
+  if (!confirm("Deseja apagar todos os registros do espelho de ponto importado?")) return;
+  if (!currentUser) return;
+
+  appState.pointEntries = [];
+  OfflineRepository.saveSnapshot(currentUser.id, appState);
+  renderPointTable();
+  if ($('kpiCreditosPonto')) $('kpiCreditosPonto').textContent = 0;
+  showToast("Espelho de ponto limpo.", "info");
+
+  if (navigator.onLine) {
     try {
-      await client.rpc('admin_delete_user', { target_user_id: userId });
-      showToast(`Usuário @${username} excluído com sucesso.`, "info");
-      await loadAdminUsers();
-    } catch(err) {
-      alert("Erro ao excluir usuário: " + err.message);
-    }
+      await client.delete('timebank_point_entries', 'user_id=eq.' + currentUser.id);
+    } catch(e) {}
+  }
+}
+
+function renderPlanningTable() {
+  const tbody = $('planTableBody');
+  if (!tbody) return;
+
+  if (appState.planning.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:var(--mut);">Nenhuma meta ou folga planejada.</td></tr>';
+    return;
   }
 
-  // MANUAL FORCE SYNC
-  async function manualForceSync() {
-    if (!currentUser) return;
-    if (!navigator.onLine) {
-      return alert("Dispositivo sem conexão com a internet.");
-    }
-    const q = OfflineRepository.getQueue(currentUser.id);
-    if (q.length === 0) {
-      await loadUserData();
-      showToast("Tudo atualizado e sincronizado com a nuvem!", "success");
-      return;
-    }
+  tbody.innerHTML = appState.planning.map((pl, idx) => `
+    <tr>
+      <td><b>${formatDateBR(pl.date)}</b></td>
+      <td><span class="badge neutral">${pl.type || 'Meta'}</span></td>
+      <td>${pl.hours} horas</td>
+      <td>
+        <button class="btn secondary icon-only" onclick="deletePlan('${pl.id || idx}')" title="Excluir">
+          <svg class="svg-icon sm" style="stroke:var(--red);"><use href="#icon-trash"/></svg>
+        </button>
+      </td>
+    </tr>
+  `).join('');
+}
 
-    showToast(`Sincronizando ${q.length} operações pendentes...`, "info");
-    for (const op of q) {
+// CRUD FOR ENTRIES
+async function handleSaveEntry(e) {
+  e.preventDefault();
+  if (!currentUser) return;
+
+  const date = $('entryDate').value;
+  const in1 = $('entryIn1').value || null;
+  const out1 = $('entryOut1').value || null;
+  const in2 = $('entryIn2').value || null;
+  const out2 = $('entryOut2').value || null;
+  const double_hours = $('entryDouble').value === 'true';
+
+  const newRecord = {
+    user_id: currentUser.id,
+    date,
+    in1,
+    out1,
+    in2,
+    out2,
+    double_hours,
+    status: 'Registrado',
+    source: 'manual'
+  };
+
+  const existingIdx = appState.entries.findIndex(it => it.date === date);
+  if (existingIdx >= 0) appState.entries[existingIdx] = newRecord;
+  else appState.entries.unshift(newRecord);
+  appState.entries.sort((a, b) => b.date.localeCompare(a.date));
+
+  OfflineRepository.saveSnapshot(currentUser.id, appState);
+  renderDashboard();
+  showToast("Lançamento gravado!", "success");
+
+  if (navigator.onLine) {
+    try {
+      await client.upsert('timebank_entries', newRecord);
+    } catch(err) {
+      OfflineRepository.addToQueue(currentUser.id, { action: 'upsert', table: 'timebank_entries', data: newRecord });
+    }
+  } else {
+    OfflineRepository.addToQueue(currentUser.id, { action: 'upsert', table: 'timebank_entries', data: newRecord });
+  }
+}
+
+async function deleteEntry(date) {
+  if (!confirm(`Deseja excluir o lançamento do dia ${formatDateBR(date)}?`)) return;
+  if (!currentUser) return;
+
+  appState.entries = appState.entries.filter(it => it.date !== date);
+  OfflineRepository.saveSnapshot(currentUser.id, appState);
+  renderDashboard();
+  showToast("Lançamento removido.", "info");
+
+  const filter = `user_id=eq.${currentUser.id}&date=eq.${date}`;
+  if (navigator.onLine) {
+    try {
+      await client.delete('timebank_entries', filter);
+    } catch(err) {
+      OfflineRepository.addToQueue(currentUser.id, { action: 'delete', table: 'timebank_entries', filter });
+    }
+  } else {
+    OfflineRepository.addToQueue(currentUser.id, { action: 'delete', table: 'timebank_entries', filter });
+  }
+}
+
+async function handleClearAll() {
+  if (!confirm("ATENÇÃO: Deseja apagar TODOS os seus lançamentos da base? Esta ação é irreversível.")) return;
+  if (!currentUser) return;
+
+  appState.entries = [];
+  appState.pointEntries = [];
+  appState.planning = [];
+  OfflineRepository.saveSnapshot(currentUser.id, appState);
+  renderAllViews();
+  showToast("Todos os registros locais foram limpos.", "info");
+
+  if (navigator.onLine) {
+    try {
+      await client.delete('timebank_entries', 'user_id=eq.' + currentUser.id);
+      await client.delete('timebank_point_entries', 'user_id=eq.' + currentUser.id);
+      await client.delete('timebank_planning', 'user_id=eq.' + currentUser.id);
+    } catch(e) {}
+  }
+}
+
+// SMART CSV / TSV TIME CARD PARSER ("Outubro.csv")
+function openImportModal() {
+  $('importModal').classList.add('open');
+  $('importPreviewArea').style.display = 'none';
+  $('btnConfirmImport').disabled = true;
+  appState.parsedImportEntries = [];
+}
+function closeImportModal() { $('importModal').classList.remove('open'); }
+
+function handleDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('dragover'); }
+function handleDragLeave(e) { e.currentTarget.classList.remove('dragover'); }
+function handleDrop(e) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('dragover');
+  if (e.dataTransfer.files && e.dataTransfer.files[0]) readFile(e.dataTransfer.files[0]);
+}
+function handleFileSelect(e) {
+  if (e.target.files && e.target.files[0]) readFile(e.target.files[0]);
+}
+function readFile(file) {
+  const r = new FileReader();
+  r.onload = ev => {
+    $('importRawText').value = ev.target.result;
+    parseRawInput();
+  };
+  r.readAsText(file);
+}
+
+function parseRawInput() {
+  const text = $('importRawText').value;
+  const results = parseTimecardContent(text);
+
+  if (results.length === 0) {
+    alert("Nenhum dia de ponto com horários válidos foi detectado no arquivo. Verifique o formato.");
+    return;
+  }
+
+  appState.parsedImportEntries = results;
+  renderImportPreview();
+}
+
+function renderImportPreview() {
+  const list = appState.parsedImportEntries;
+  $('importCountBadge').textContent = `${list.length} dias identificados`;
+  $('importPreviewArea').style.display = 'block';
+  $('btnConfirmImport').disabled = false;
+
+  const tbody = $('importPreviewBody');
+  tbody.innerHTML = list.slice(0, 31).map(it => {
+    const worked = calculateDailyWorked(it.in1, it.out1, it.in2, it.out2);
+    const saldo = worked - (8 * 60);
+    return `
+      <tr>
+        <td><b>${formatDateBR(it.date)}</b></td>
+        <td>${it.in1 || '--:--'}</td>
+        <td>${it.out1 || '--:--'}</td>
+        <td>${it.in2 || '--:--'}</td>
+        <td>${it.out2 || '--:--'}</td>
+        <td>${formatMinutes(worked, false)}</td>
+        <td><span class="badge ${saldo >= 0 ? 'positive' : 'negative'}">${formatMinutes(saldo)}</span></td>
+      </tr>
+    `;
+  }).join('');
+}
+
+async function executeImport() {
+  if (!currentUser || appState.parsedImportEntries.length === 0) return;
+  const btn = $('btnConfirmImport');
+  btn.disabled = true;
+  btn.textContent = "Sincronizando...";
+
+  const entriesToSave = appState.parsedImportEntries.map(it => ({
+    user_id: currentUser.id,
+    date: it.date,
+    in1: it.in1,
+    out1: it.out1,
+    in2: it.in2,
+    out2: it.out2,
+    double_hours: it.double_hours,
+    status: 'Importado de Cartão Ponto',
+    source: 'csv_import'
+  }));
+
+  const pointEntriesToSave = appState.parsedImportEntries.map(it => ({
+    user_id: currentUser.id,
+    date: it.date,
+    in1: it.in1,
+    out1: it.out1,
+    in2: it.in2,
+    out2: it.out2,
+    status: 'Importado',
+    source: 'ponto'
+  }));
+
+  for (const item of entriesToSave) {
+    const idx = appState.entries.findIndex(e => e.date === item.date);
+    if (idx >= 0) appState.entries[idx] = item;
+    else appState.entries.push(item);
+  }
+  appState.entries.sort((a, b) => b.date.localeCompare(a.date));
+
+  for (const pItem of pointEntriesToSave) {
+    const pIdx = appState.pointEntries.findIndex(e => e.date === pItem.date);
+    if (pIdx >= 0) appState.pointEntries[pIdx] = pItem;
+    else appState.pointEntries.push(pItem);
+  }
+  appState.pointEntries.sort((a, b) => b.date.localeCompare(a.date));
+
+  OfflineRepository.saveSnapshot(currentUser.id, appState);
+  renderAllViews();
+
+  closeImportModal();
+  showToast(`${entriesToSave.length} dias importados com sucesso!`, "success");
+
+  if (navigator.onLine) {
+    for (const item of entriesToSave) {
       try {
-        if (op.action === 'upsert') await client.upsert(op.table, op.data);
-        else if (op.action === 'delete') await client.delete(op.table, op.filter);
-      } catch(e) { console.warn("Falha ao sincronizar item da fila", op, e); }
+        await client.upsert('timebank_entries', item);
+      } catch(e) {
+        OfflineRepository.addToQueue(currentUser.id, { action: 'upsert', table: 'timebank_entries', data: item });
+      }
     }
-    OfflineRepository.clearQueue(currentUser.id);
+    for (const pItem of pointEntriesToSave) {
+      try {
+        await client.upsert('timebank_point_entries', pItem);
+      } catch(e) {
+        OfflineRepository.addToQueue(currentUser.id, { action: 'upsert', table: 'timebank_point_entries', data: pItem });
+      }
+    }
+  } else {
+    for (const item of entriesToSave) {
+      OfflineRepository.addToQueue(currentUser.id, { action: 'upsert', table: 'timebank_entries', data: item });
+    }
+    for (const pItem of pointEntriesToSave) {
+      OfflineRepository.addToQueue(currentUser.id, { action: 'upsert', table: 'timebank_point_entries', data: pItem });
+    }
+  }
+  btn.disabled = false;
+  btn.textContent = "Confirmar e Sincronizar";
+}
+
+// EXPORT CSV
+function exportCSV() {
+  if (appState.entries.length === 0) return alert("Não há lançamentos para exportar.");
+  const header = "Data;Dia;Entrada 1;Saida 1;Entrada 2;Saida 2;Horas Trabalhadas;Saldo Minutos;Saldo Formatado\n";
+  const rows = appState.entries.map(e => {
+    const worked = calculateDailyWorked(e.in1, e.out1, e.in2, e.out2);
+    const saldo = worked - (8 * 60);
+    return `${formatDateBR(e.date)};${getWeekdayName(e.date)};${e.in1 || ''};${e.out1 || ''};${e.in2 || ''};${e.out2 || ''};${formatMinutes(worked, false)};${saldo};${formatMinutes(saldo)}`;
+  }).join('\n');
+
+  const blob = new Blob([header + rows], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `banco_de_horas_${userProfile ? userProfile.username : 'export'}.csv`;
+  a.click();
+  showToast("Arquivo CSV baixado!", "success");
+}
+
+// USER SELF-SERVICE PASSWORD CHANGE
+function openChangePasswordModal() {
+  $('changePasswordModal').classList.add('open');
+  $('userDropdown').classList.remove('open');
+  $('selfNewPassword').value = '';
+  $('selfConfirmPassword').value = '';
+}
+function closeChangePasswordModal() { $('changePasswordModal').classList.remove('open'); }
+
+async function handleSelfPasswordChange(e) {
+  e.preventDefault();
+  const p1 = $('selfNewPassword').value;
+  const p2 = $('selfConfirmPassword').value;
+  if (p1 !== p2) return alert("As senhas informadas não conferem.");
+  if (p1.length < 6) return alert("A senha deve ter no mínimo 6 caracteres.");
+
+  try {
+    await client.updatePassword(p1);
+    closeChangePasswordModal();
+    showToast("Sua senha foi alterada com sucesso!", "success");
+  } catch(err) {
+    alert("Erro ao alterar senha: " + err.message);
+  }
+}
+
+// ADMIN CONTROLS (DEDICATED ADMIN TAB)
+let adminUsersList = [];
+async function loadAdminUsers() {
+  if (!currentUser || (userProfile && userProfile.role !== 'admin')) return;
+  try {
+    const users = await client.rpc('admin_list_users', {});
+    adminUsersList = users || [];
+    renderAdminUsersTable(adminUsersList);
+
+    $('admKpiUsers').textContent = adminUsersList.length;
+    $('admKpiAdmins').textContent = adminUsersList.filter(u => u.role === 'admin').length;
+    const totalGlobalEntries = adminUsersList.reduce((acc, u) => acc + (parseInt(u.entries_count) || 0), 0);
+    $('admKpiEntries').textContent = totalGlobalEntries;
+  } catch(err) {
+    console.warn("Falha ao carregar lista de usuários admin:", err);
+  }
+}
+
+function renderAdminUsersTable(users) {
+  const tbody = $('admUsersTableBody');
+  if (!tbody) return;
+
+  if (users.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:24px; color:var(--mut);">Nenhum usuário encontrado.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = users.map(u => `
+    <tr>
+      <td><b>@${u.username}</b></td>
+      <td>${u.full_name || 'Sem nome'}</td>
+      <td><span class="badge ${u.role === 'admin' ? 'admin' : 'user'}">${u.role === 'admin' ? 'Administrador' : 'Colaborador'}</span></td>
+      <td style="color:var(--mut); font-size:12px;">${formatDateBR(u.created_at.split('T')[0])}</td>
+      <td><b>${u.entries_count || 0}</b> lançamentos</td>
+      <td>
+        <div style="display:flex; gap:6px;">
+          <button class="btn secondary icon-only" onclick="openAdminResetModal('${u.user_id}', '${u.username}')" title="Redefinir senha">
+            <svg class="svg-icon sm"><use href="#icon-key"/></svg>
+          </button>
+          ${u.username !== 'admin' && u.username !== (userProfile ? userProfile.username : '') ? `
+            <button class="btn danger icon-only" onclick="handleAdminDeleteUser('${u.user_id}', '${u.username}')" title="Excluir usuário">
+              <svg class="svg-icon sm"><use href="#icon-trash"/></svg>
+            </button>
+          ` : ''}
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function filterAdminUsers() {
+  const q = $('admUserSearch').value.toLowerCase().trim();
+  const filtered = adminUsersList.filter(u => u.username.toLowerCase().includes(q) || (u.full_name && u.full_name.toLowerCase().includes(q)));
+  renderAdminUsersTable(filtered);
+}
+
+async function handleAdminCreateUser(e) {
+  e.preventDefault();
+  const fullName = $('admNewFullName').value.trim();
+  const username = $('admNewUsername').value.trim().toLowerCase();
+  const password = $('admNewPassword').value;
+  const role = $('admNewRole').value;
+
+  try {
+    await client.signUp(username, password, fullName, role);
+    showToast(`Usuário @${username} criado com sucesso!`, "success");
+    $('admNewFullName').value = '';
+    $('admNewUsername').value = '';
+    $('admNewPassword').value = '';
+    await loadAdminUsers();
+  } catch(err) {
+    alert("Erro ao criar usuário: " + err.message);
+  }
+}
+
+function openAdminResetModal(userId, username) {
+  $('admResetModal').classList.add('open');
+  $('admResetUserId').value = userId;
+  $('admResetUserName').value = '@' + username;
+  $('admResetNewPass').value = '';
+}
+function closeAdminResetModal() { $('admResetModal').classList.remove('open'); }
+
+async function handleConfirmAdminReset(e) {
+  e.preventDefault();
+  const userId = $('admResetUserId').value;
+  const newPass = $('admResetNewPass').value;
+  if (newPass.length < 6) return alert("A senha deve ter no mínimo 6 caracteres.");
+
+  try {
+    await client.rpc('admin_reset_password', { target_user_id: userId, new_password: newPass });
+    closeAdminResetModal();
+    showToast("Senha redefinida com sucesso!", "success");
+  } catch(err) {
+    alert("Erro ao redefinir senha: " + err.message);
+  }
+}
+
+async function handleAdminDeleteUser(userId, username) {
+  if (!confirm(`Tem certeza absoluta de que deseja excluir o usuário @${username} e todos os seus lançamentos?`)) return;
+  try {
+    await client.rpc('admin_delete_user', { target_user_id: userId });
+    showToast(`Usuário @${username} excluído com sucesso.`, "info");
+    await loadAdminUsers();
+  } catch(err) {
+    alert("Erro ao excluir usuário: " + err.message);
+  }
+}
+
+// MANUAL FORCE SYNC
+async function manualForceSync() {
+  if (!currentUser) return;
+  if (!navigator.onLine) return alert("Dispositivo sem conexão com a internet.");
+
+  const q = OfflineRepository.getQueue(currentUser.id);
+  if (q.length === 0) {
     await loadUserData();
-    showToast("Sincronização concluída com sucesso!", "success");
+    showToast("Tudo atualizado e sincronizado com a nuvem!", "success");
+    return;
   }
 
-  // NAVIGATION & UI TOGGLES
-  function showView(viewId, btn) {
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
-    $(viewId).classList.add('active');
-    if (btn) btn.classList.add('active');
+  showToast(`Sincronizando ${q.length} operações pendentes...`, "info");
+  for (const op of q) {
+    try {
+      if (op.action === 'upsert') await client.upsert(op.table, op.data);
+      else if (op.action === 'delete') await client.delete(op.table, op.filter);
+    } catch(e) { console.warn("Falha ao sincronizar item da fila", op, e); }
+  }
+  OfflineRepository.clearQueue(currentUser.id);
+  await loadUserData();
+  showToast("Sincronização concluída com sucesso!", "success");
+}
 
-    const titles = {
-      'v-dashboard': 'Dashboard & Horas',
-      'v-point': 'Cartão Ponto Oficial',
-      'v-sim': 'Simulação de Banco de Horas',
-      'v-plan': 'Planejamento e Metas',
-      'v-admin': 'Painel Administrativo'
-    };
-    $('pageTitle').textContent = titles[viewId] || 'Banco de Horas';
+// NAVIGATION & UI TOGGLES
+function showView(viewId, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+  $(viewId).classList.add('active');
+  if (btn) btn.classList.add('active');
 
-    if (window.innerWidth <= 900) {
-      document.body.classList.remove('side-open');
+  const titles = {
+    'v-dashboard': 'Dashboard & Horas',
+    'v-point': 'Cartão Ponto Oficial',
+    'v-sim': 'Simulação de Banco de Horas',
+    'v-plan': 'Planejamento e Metas',
+    'v-admin': 'Painel Administrativo'
+  };
+  $('pageTitle').textContent = titles[viewId] || 'Banco de Horas';
+
+  if (window.innerWidth <= 900) {
+    document.body.classList.remove('side-open');
+  }
+}
+
+function toggleSide() {
+  if (window.innerWidth <= 900) {
+    document.body.classList.toggle('side-open');
+  } else {
+    document.body.classList.toggle('side-collapsed');
+  }
+}
+
+function toggleUserDropdown(e) {
+  e.stopPropagation();
+  $('userDropdown').classList.toggle('open');
+}
+window.addEventListener('click', () => { $('userDropdown').classList.remove('open'); });
+
+function toggleDarkMode() {
+  document.body.classList.toggle('dark');
+  const isDark = document.body.classList.contains('dark');
+  localStorage.setItem('timebank_theme', isDark ? 'dark' : 'light');
+  $('themeIcon').innerHTML = `<use href="#icon-${isDark ? 'sun' : 'moon'}"/>`;
+}
+
+function showToast(msg, type = 'info') {
+  const c = $('toastContainer');
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.innerHTML = `<span>${msg}</span>`;
+  c.appendChild(t);
+  setTimeout(() => {
+    t.style.opacity = '0';
+    t.style.transform = 'translateY(10px)';
+    t.style.transition = 'all .25s ease';
+    setTimeout(() => t.remove(), 250);
+  }, 4000);
+}
+
+// SIMULATION & PLANNING
+function calculateSimulation() {
+  const extraMin = parseInt($('simDailyMinutes').value, 10) || 0;
+  const days = parseInt($('simDaysAvailable').value, 10) || 0;
+  const totalExtra = extraMin * days;
+  const formatted = formatMinutes(totalExtra);
+  $('simResult').textContent = `Você acumulará aproximadamente ${formatted} adicionais em ${days} dias úteis (${formatMinutes(extraMin, false)} por dia).`;
+}
+
+async function handleSavePlan(e) {
+  e.preventDefault();
+  if (!currentUser) return;
+  const date = $('planDate').value;
+  const type = $('planType').value;
+  const hours = parseFloat($('planHours').value) || 0;
+
+  const item = { user_id: currentUser.id, date, type, hours };
+  appState.planning.push(item);
+  renderPlanningTable();
+  OfflineRepository.saveSnapshot(currentUser.id, appState);
+  showToast("Meta planejada adicionada!", "success");
+
+  if (navigator.onLine) {
+    try {
+      const res = await client.upsert('timebank_planning', item);
+      if (res && res[0] && res[0].id) item.id = res[0].id;
+      OfflineRepository.saveSnapshot(currentUser.id, appState);
+    } catch(err) {
+      OfflineRepository.addToQueue(currentUser.id, { action: 'upsert', table: 'timebank_planning', data: item });
     }
+  } else {
+    OfflineRepository.addToQueue(currentUser.id, { action: 'upsert', table: 'timebank_planning', data: item });
   }
+}
 
-  function toggleSide() {
-    if (window.innerWidth <= 900) {
-      document.body.classList.toggle('side-open');
+async function deletePlan(identifier) {
+  if (!confirm("Deseja realmente remover esta meta?")) return;
+  if (!currentUser) return;
+
+  const idx = appState.planning.findIndex((it, index) => (it.id && String(it.id) === String(identifier)) || String(index) === String(identifier) || it.date === identifier);
+  let removed = null;
+  if (idx >= 0) {
+    removed = appState.planning.splice(idx, 1)[0];
+  }
+  OfflineRepository.saveSnapshot(currentUser.id, appState);
+  renderPlanningTable();
+  showToast("Meta removida.", "info");
+
+  if (removed) {
+    const filter = removed.id ? `id=eq.${removed.id}` : `user_id=eq.${currentUser.id}&date=eq.${removed.date}`;
+    if (navigator.onLine) {
+      try {
+        await client.delete('timebank_planning', filter);
+      } catch(err) {
+        OfflineRepository.addToQueue(currentUser.id, { action: 'delete', table: 'timebank_planning', filter });
+      }
     } else {
-      document.body.classList.toggle('side-collapsed');
+      OfflineRepository.addToQueue(currentUser.id, { action: 'delete', table: 'timebank_planning', filter });
     }
   }
+}
 
-  function toggleUserDropdown(e) {
-    e.stopPropagation();
-    $('userDropdown').classList.toggle('open');
-  }
-  window.addEventListener('click', () => { $('userDropdown').classList.remove('open'); });
-
-  function toggleDarkMode() {
-    document.body.classList.toggle('dark');
-    const isDark = document.body.classList.contains('dark');
-    localStorage.setItem('timebank_theme', isDark ? 'dark' : 'light');
-    $('themeIcon').innerHTML = `<use href="#icon-${isDark ? 'sun' : 'moon'}"/>`;
+// INITIALIZATION
+window.addEventListener('DOMContentLoaded', () => {
+  if (localStorage.getItem('timebank_theme') === 'dark') {
+    document.body.classList.add('dark');
+    $('themeIcon').innerHTML = '<use href="#icon-sun"/>';
   }
 
-  function showToast(msg, type = 'info') {
-    const c = $('toastContainer');
-    const t = document.createElement('div');
-    t.className = 'toast ' + type;
-    t.innerHTML = `<span>${msg}</span>`;
-    c.appendChild(t);
-    setTimeout(() => {
-      t.style.opacity = '0';
-      t.style.transform = 'translateY(10px)';
-      t.style.transition = 'all .25s ease';
-      setTimeout(() => t.remove(), 250);
-    }, 4000);
+  if (client.session && client.session.user) {
+    initAuthenticatedSession(client.session.user);
+  } else {
+    $('authBackdrop').classList.add('open');
   }
 
-  // INITIALIZATION
-  window.addEventListener('DOMContentLoaded', () => {
-    // Theme restore
-    if (localStorage.getItem('timebank_theme') === 'dark') {
-      document.body.classList.add('dark');
-      $('themeIcon').innerHTML = '<use href="#icon-sun"/>';
-    }
+  if (window.innerWidth <= 900) {
+    $('mobileMenuBtn').style.display = 'inline-flex';
+  }
+});
 
-    // Auto login check
-    if (client.session && client.session.user) {
-      initAuthenticatedSession(client.session.user);
-    } else {
-      $('authBackdrop').classList.add('open');
-    }
-
-    // Mobile menu button visibility
-    if (window.innerWidth <= 900) {
-      $('mobileMenuBtn').style.display = 'inline-flex';
-    }
-  });
   </script>
 </body>
 </html>

@@ -76,6 +76,11 @@ function parseTimecardContent(text) {
   const dateISORegex = /\b(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})\b/;
 
   for (const line of lines) {
+    // Ignore metadata and report headers commonly found in Ahgora, Secullum, Senior etc.
+    if (/^(per[ií]odo|emitido|emiss[aã]o|relat[oó]rio|p[aá]gina|cnpj|folha|empresa|colaborador|funcion[aá]rio)/i.test(line)) {
+      continue;
+    }
+
     let isoDate = null;
     const matchBR = line.match(dateBRRegex);
     if (matchBR) {
@@ -96,15 +101,25 @@ function parseTimecardContent(text) {
     const times = line.match(timeRegex) || [];
     if (times.length === 0) continue;
 
-    results.push({
+    // Prevent duplicate entries for the same date from the same file
+    const existingIdx = results.findIndex(it => it.date === isoDate);
+    const entryData = {
       date: isoDate,
       in1: times[0] || null,
       out1: times[1] || null,
       in2: times[2] || null,
       out2: times[3] || null,
       double_hours: false
-    });
+    };
+
+    if (existingIdx >= 0) {
+      results[existingIdx] = entryData;
+    } else {
+      results.push(entryData);
+    }
   }
 
+  // Sort by date ascending
+  results.sort((a, b) => a.date.localeCompare(b.date));
   return results;
 }
