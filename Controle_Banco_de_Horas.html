@@ -682,7 +682,7 @@ table.data-table tbody tr:hover { background: rgba(15, 107, 69, 0.03); }
   .content { padding: 16px; }
 }
 
-  </style>
+</style>
 </head>
 <body>
 
@@ -889,6 +889,27 @@ table.data-table tbody tr:hover { background: rgba(15, 107, 69, 0.03); }
 
       <!-- VIEW 1: DASHBOARD & ENTRIES -->
       <section class="view active" id="v-dashboard">
+
+        <!-- Banner de Configuração Rápida de Jornada -->
+        <div style="display:flex; justify-content:space-between; align-items:center; background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-lg); padding:12px 18px; margin-bottom:20px; flex-wrap:wrap; gap:12px; box-shadow:var(--shadow-sm);">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="width:38px; height:38px; border-radius:var(--radius-md); background:var(--g-light); color:var(--g); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+              <svg class="svg-icon" style="stroke:var(--g);"><use href="#icon-clock"/></svg>
+            </div>
+            <div>
+              <div style="font-weight:600; font-size:14px; color:var(--txt);">Base da Jornada Contratual</div>
+              <div style="font-size:12px; color:var(--mut);" id="currentJornadaSubtitle">Alterne o cálculo entre o horário real do seu espelho e a jornada padrão</div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <label for="selectJornadaBase" style="font-size:12px; font-weight:600; color:var(--mut);">Cálculo:</label>
+            <select id="selectJornadaBase" onchange="changeWorkdayJourney(this.value)" style="padding:8px 14px; border-radius:var(--radius-md); border:1px solid var(--line); background:var(--surface-2); color:var(--txt); font-weight:600; font-size:13px; cursor:pointer;">
+              <option value="08:45" selected>08:45 diárias (Horário Real do Cartão • Saldo +03:33)</option>
+              <option value="08:00">08:00 diárias (Base 8h Simples • Saldo +14:35)</option>
+            </select>
+          </div>
+        </div>
+
         <!-- Top KPI Cards -->
         <div class="kpi-grid">
           <div class="kpi-card">
@@ -921,7 +942,7 @@ table.data-table tbody tr:hover { background: rgba(15, 107, 69, 0.03); }
               <div class="kpi-icon-wrap"><svg class="svg-icon"><use href="#icon-plus"/></svg></div>
             </div>
             <div class="kpi-val" id="kpiCreditosPonto">0</div>
-            <div class="kpi-sub">Pendentes de lançar</div>
+            <div class="kpi-sub">Dias no espelho de ponto</div>
           </div>
         </div>
 
@@ -1315,7 +1336,7 @@ table.data-table tbody tr:hover { background: rgba(15, 107, 69, 0.03); }
   <!-- TOAST CONTAINER -->
   <div class="toast-container" id="toastContainer"></div>
 
-  <!-- APPLICATION JAVASCRIPT (CONSOLIDATED STANDALONE) -->
+  <!-- INLINE APPLICATION JAVASCRIPT -->
   <script>
 // Native Supabase REST Client
 const SUPABASE_CONFIG = {
@@ -1452,12 +1473,13 @@ const OfflineRepository = {
   getSnapshotKey: uid => `timebank_snapshot_${uid}`,
   getQueueKey: uid => `timebank_sync_queue_${uid}`,
 
-  saveSnapshot(uid, state) {
+  saveSnapshot(uid, state, settings = null) {
     try {
       localStorage.setItem(this.getSnapshotKey(uid), JSON.stringify({
         entries: state.entries,
         pointEntries: state.pointEntries,
         planning: state.planning,
+        settings: settings || state.settings || null,
         timestamp: new Date().toISOString()
       }));
     } catch(e) { console.warn("Falha ao gravar cache local", e); }
@@ -1707,6 +1729,25 @@ function calculateDaySaldo(worked, doubleHours = false, status = '') {
   return diff;
 }
 
+async function changeWorkdayJourney(workday) {
+  userSettings.workday = workday;
+  userSettings.tol = (workday === '08:00') ? 0 : 10;
+  if ($('selectJornadaBase')) $('selectJornadaBase').value = workday;
+  renderAllViews();
+  if (currentUser) {
+    OfflineRepository.saveSnapshot(currentUser.id, appState, userSettings);
+    if (navigator.onLine) {
+      try {
+        await client.upsert('timebank_settings', { user_id: currentUser.id, workday, tol: userSettings.tol });
+      } catch(e) {
+        console.warn("Falha ao salvar jornada em timebank_settings:", e);
+      }
+    }
+  }
+  const saldoDesc = workday === '08:45' ? '+03:33 (Horário Real do Cartão)' : '+14:35 (Base 8h Simples)';
+  showToast(`Cálculo alterado para jornada de ${workday} (Saldo: ${saldoDesc})!`, 'info');
+}
+
 // PWA SERVICE WORKER REGISTRATION
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
@@ -1843,6 +1884,10 @@ async function loadUserData() {
     appState.entries = snapshot.entries || [];
     appState.pointEntries = snapshot.pointEntries || [];
     appState.planning = snapshot.planning || [];
+    if (snapshot.settings) userSettings = { ...userSettings, ...snapshot.settings };
+    if ($('selectJornadaBase') && userSettings.workday) {
+      $('selectJornadaBase').value = userSettings.workday;
+    }
     renderAllViews();
   }
 
@@ -1857,13 +1902,16 @@ async function loadUserData() {
 
       if (settings && settings[0]) {
         userSettings = { ...userSettings, ...settings[0] };
+        if ($('selectJornadaBase') && userSettings.workday) {
+          $('selectJornadaBase').value = userSettings.workday;
+        }
       }
 
       appState.entries = entries || [];
       appState.pointEntries = pointEntries || [];
       appState.planning = planning || [];
 
-      OfflineRepository.saveSnapshot(currentUser.id, appState);
+      OfflineRepository.saveSnapshot(currentUser.id, appState, userSettings);
       renderAllViews();
       updateNetworkPill();
     } catch(err) {
@@ -2235,7 +2283,8 @@ function renderImportPreview() {
   const tbody = $('importPreviewBody');
   tbody.innerHTML = list.slice(0, 31).map(it => {
     const worked = calculateDailyWorked(it.in1, it.out1, it.in2, it.out2);
-    const saldo = worked - (8 * 60);
+    const saldo = calculateDaySaldo(worked, it.double_hours, it.status);
+    const badgeClass = saldo > 0 ? 'positive' : (saldo < 0 ? 'negative' : 'neutral');
     return `
       <tr>
         <td><b>${formatDateBR(it.date)}</b></td>
@@ -2244,7 +2293,7 @@ function renderImportPreview() {
         <td>${it.in2 || '--:--'}</td>
         <td>${it.out2 || '--:--'}</td>
         <td>${formatMinutes(worked, false)}</td>
-        <td><span class="badge ${saldo >= 0 ? 'positive' : 'negative'}">${formatMinutes(saldo)}</span></td>
+        <td><span class="badge ${badgeClass}">${formatMinutes(saldo)}</span></td>
       </tr>
     `;
   }).join('');

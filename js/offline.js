@@ -3,12 +3,13 @@ const OfflineRepository = {
   getSnapshotKey: uid => `timebank_snapshot_${uid}`,
   getQueueKey: uid => `timebank_sync_queue_${uid}`,
 
-  saveSnapshot(uid, state) {
+  saveSnapshot(uid, state, settings = null) {
     try {
       localStorage.setItem(this.getSnapshotKey(uid), JSON.stringify({
         entries: state.entries,
         pointEntries: state.pointEntries,
         planning: state.planning,
+        settings: settings || state.settings || null,
         timestamp: new Date().toISOString()
       }));
     } catch(e) { console.warn("Falha ao gravar cache local", e); }

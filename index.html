@@ -12,7 +12,7 @@
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <title>Controle de Banco de Horas</title>
   
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css?v=1.3.0">
 </head>
 <body>
 
@@ -219,6 +219,27 @@
 
       <!-- VIEW 1: DASHBOARD & ENTRIES -->
       <section class="view active" id="v-dashboard">
+
+        <!-- Banner de Configuração Rápida de Jornada -->
+        <div style="display:flex; justify-content:space-between; align-items:center; background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-lg); padding:12px 18px; margin-bottom:20px; flex-wrap:wrap; gap:12px; box-shadow:var(--shadow-sm);">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div style="width:38px; height:38px; border-radius:var(--radius-md); background:var(--g-light); color:var(--g); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+              <svg class="svg-icon" style="stroke:var(--g);"><use href="#icon-clock"/></svg>
+            </div>
+            <div>
+              <div style="font-weight:600; font-size:14px; color:var(--txt);">Base da Jornada Contratual</div>
+              <div style="font-size:12px; color:var(--mut);" id="currentJornadaSubtitle">Alterne o cálculo entre o horário real do seu espelho e a jornada padrão</div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <label for="selectJornadaBase" style="font-size:12px; font-weight:600; color:var(--mut);">Cálculo:</label>
+            <select id="selectJornadaBase" onchange="changeWorkdayJourney(this.value)" style="padding:8px 14px; border-radius:var(--radius-md); border:1px solid var(--line); background:var(--surface-2); color:var(--txt); font-weight:600; font-size:13px; cursor:pointer;">
+              <option value="08:45" selected>08:45 diárias (Horário Real do Cartão • Saldo +03:33)</option>
+              <option value="08:00">08:00 diárias (Base 8h Simples • Saldo +14:35)</option>
+            </select>
+          </div>
+        </div>
+
         <!-- Top KPI Cards -->
         <div class="kpi-grid">
           <div class="kpi-card">
@@ -251,7 +272,7 @@
               <div class="kpi-icon-wrap"><svg class="svg-icon"><use href="#icon-plus"/></svg></div>
             </div>
             <div class="kpi-val" id="kpiCreditosPonto">0</div>
-            <div class="kpi-sub">Pendentes de lançar</div>
+            <div class="kpi-sub">Dias no espelho de ponto</div>
           </div>
         </div>
 
@@ -646,9 +667,9 @@
   <div class="toast-container" id="toastContainer"></div>
 
   <!-- APPLICATION JAVASCRIPT -->
-  <script src="js/supabase.js"></script>
-  <script src="js/offline.js"></script>
-  <script src="js/parser.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/supabase.js?v=1.3.0"></script>
+  <script src="js/offline.js?v=1.3.0"></script>
+  <script src="js/parser.js?v=1.3.0"></script>
+  <script src="js/app.js?v=1.3.0"></script>
 </body>
 </html>

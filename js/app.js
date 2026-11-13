@@ -27,6 +27,25 @@ function calculateDaySaldo(worked, doubleHours = false, status = '') {
   return diff;
 }
 
+async function changeWorkdayJourney(workday) {
+  userSettings.workday = workday;
+  userSettings.tol = (workday === '08:00') ? 0 : 10;
+  if ($('selectJornadaBase')) $('selectJornadaBase').value = workday;
+  renderAllViews();
+  if (currentUser) {
+    OfflineRepository.saveSnapshot(currentUser.id, appState, userSettings);
+    if (navigator.onLine) {
+      try {
+        await client.upsert('timebank_settings', { user_id: currentUser.id, workday, tol: userSettings.tol });
+      } catch(e) {
+        console.warn("Falha ao salvar jornada em timebank_settings:", e);
+      }
+    }
+  }
+  const saldoDesc = workday === '08:45' ? '+03:33 (Horário Real do Cartão)' : '+14:35 (Base 8h Simples)';
+  showToast(`Cálculo alterado para jornada de ${workday} (Saldo: ${saldoDesc})!`, 'info');
+}
+
 // PWA SERVICE WORKER REGISTRATION
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
@@ -163,6 +182,10 @@ async function loadUserData() {
     appState.entries = snapshot.entries || [];
     appState.pointEntries = snapshot.pointEntries || [];
     appState.planning = snapshot.planning || [];
+    if (snapshot.settings) userSettings = { ...userSettings, ...snapshot.settings };
+    if ($('selectJornadaBase') && userSettings.workday) {
+      $('selectJornadaBase').value = userSettings.workday;
+    }
     renderAllViews();
   }
 
@@ -177,13 +200,16 @@ async function loadUserData() {
 
       if (settings && settings[0]) {
         userSettings = { ...userSettings, ...settings[0] };
+        if ($('selectJornadaBase') && userSettings.workday) {
+          $('selectJornadaBase').value = userSettings.workday;
+        }
       }
 
       appState.entries = entries || [];
       appState.pointEntries = pointEntries || [];
       appState.planning = planning || [];
 
-      OfflineRepository.saveSnapshot(currentUser.id, appState);
+      OfflineRepository.saveSnapshot(currentUser.id, appState, userSettings);
       renderAllViews();
       updateNetworkPill();
     } catch(err) {
@@ -555,7 +581,8 @@ function renderImportPreview() {
   const tbody = $('importPreviewBody');
   tbody.innerHTML = list.slice(0, 31).map(it => {
     const worked = calculateDailyWorked(it.in1, it.out1, it.in2, it.out2);
-    const saldo = worked - (8 * 60);
+    const saldo = calculateDaySaldo(worked, it.double_hours, it.status);
+    const badgeClass = saldo > 0 ? 'positive' : (saldo < 0 ? 'negative' : 'neutral');
     return `
       <tr>
         <td><b>${formatDateBR(it.date)}</b></td>
@@ -564,7 +591,7 @@ function renderImportPreview() {
         <td>${it.in2 || '--:--'}</td>
         <td>${it.out2 || '--:--'}</td>
         <td>${formatMinutes(worked, false)}</td>
-        <td><span class="badge ${saldo >= 0 ? 'positive' : 'negative'}">${formatMinutes(saldo)}</span></td>
+        <td><span class="badge ${badgeClass}">${formatMinutes(saldo)}</span></td>
       </tr>
     `;
   }).join('');

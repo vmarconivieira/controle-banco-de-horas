@@ -1,5 +1,5 @@
 // Service Worker - Controle de Banco de Horas PWA
-const CACHE_NAME = 'timebank-pwa-v1.1.0';
+const CACHE_NAME = 'timebank-pwa-v1.3.0';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -17,12 +17,13 @@ const STATIC_ASSETS = [
 ];
 
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(STATIC_ASSETS).catch((err) => {
         console.warn('Alguns assets falharam no precache inicial:', err);
       });
-    }).then(() => self.skipWaiting())
+    })
   );
 });
 
@@ -48,34 +49,37 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // GET Requests: Cache First com Network Fallback
+  // GET Requests
   if (event.request.method === 'GET') {
-    event.respondWith(
-      caches.match(event.request).then((cachedResponse) => {
-        if (cachedResponse) {
-          fetch(event.request).then((networkResponse) => {
-            if (networkResponse && networkResponse.status === 200) {
-              caches.open(CACHE_NAME).then((cache) => cache.put(event.request, networkResponse));
-            }
-          }).catch(() => {});
-          return cachedResponse;
-        }
+    const isCode = url.pathname.endsWith('.html') || url.pathname.endsWith('.js') || url.pathname.endsWith('.css') || url.pathname === '/' || url.pathname.endsWith('/');
 
-        return fetch(event.request).then((networkResponse) => {
-          if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+    if (isCode) {
+      // Network First para HTML, JS, CSS: sempre busca a versão mais recente quando online
+      event.respondWith(
+        fetch(event.request)
+          .then((networkResponse) => {
+            if (networkResponse && networkResponse.status === 200) {
+              const responseToCache = networkResponse.clone();
+              caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache));
+            }
             return networkResponse;
-          }
-          const responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache);
+          })
+          .catch(() => caches.match(event.request))
+      );
+    } else {
+      // Cache First para imagens e fontes com Network fallback
+      event.respondWith(
+        caches.match(event.request).then((cachedResponse) => {
+          if (cachedResponse) return cachedResponse;
+          return fetch(event.request).then((networkResponse) => {
+            if (networkResponse && networkResponse.status === 200) {
+              const responseToCache = networkResponse.clone();
+              caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache));
+            }
+            return networkResponse;
           });
-          return networkResponse;
-        }).catch(() => {
-          if (event.request.headers.get('accept') && event.request.headers.get('accept').includes('text/html')) {
-            return caches.match('./index.html') || caches.match('./Controle_Banco_de_Horas.html');
-          }
-        });
-      })
-    );
+        })
+      );
+    }
   }
 });
