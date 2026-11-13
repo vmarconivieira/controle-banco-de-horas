@@ -1,0 +1,653 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f6b45">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Banco de Horas">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <title>Controle de Banco de Horas</title>
+  
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- SVG SPRITES INLINE -->
+  <svg style="display:none;">
+    <defs>
+      <g id="icon-clock"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></g>
+      <g id="icon-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></g>
+      <g id="icon-dashboard"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></g>
+      <g id="icon-users"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></g>
+      <g id="icon-shield"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></g>
+      <g id="icon-plus"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></g>
+      <g id="icon-trash"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></g>
+      <g id="icon-key"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></g>
+      <g id="icon-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></g>
+      <g id="icon-upload"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></g>
+      <g id="icon-wifi"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></g>
+      <g id="icon-wifi-off"><line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.58 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></g>
+      <g id="icon-refresh"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></g>
+      <g id="icon-check"><polyline points="20 6 9 17 4 12"/></g>
+      <g id="icon-alert"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></g>
+      <g id="icon-moon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></g>
+      <g id="icon-sun"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></g>
+      <g id="icon-settings"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></g>
+      <g id="icon-logout"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></g>
+      <g id="icon-menu"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></g>
+      <g id="icon-close"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></g>
+      <g id="icon-search"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></g>
+      <g id="icon-target"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></g>
+    </defs>
+  </svg>
+
+  <!-- AUTH SCREEN (NO EMAIL) -->
+  <div class="modal-backdrop open" id="authBackdrop" style="background:#0d1a15; z-index:150;">
+    <div class="modal-box" style="max-width:440px; padding:0;">
+      <div style="background:linear-gradient(135deg, #13251f 0%, #0f6b45 100%); padding:28px 24px; color:white; text-align:center;">
+        <div class="brand-badge" style="width:48px; height:48px; margin:0 auto 12px; background:rgba(255,255,255,0.18);">
+          <svg class="svg-icon lg" style="stroke:white;"><use href="#icon-clock"/></svg>
+        </div>
+        <h2 style="margin:0 0 4px; font-size:20px; font-weight:700; letter-spacing:-0.02em;">Banco de Horas</h2>
+        <p style="margin:0; font-size:13px; color:#cbe3d6;">Acesso seguro e sincronização em nuvem</p>
+      </div>
+
+      <div style="padding:22px;">
+        <div style="display:flex; border-bottom:1px solid var(--line); margin-bottom:18px;">
+          <button type="button" id="tabLogin" onclick="switchAuthTab('login')" style="flex:1; padding:10px; background:none; border:none; border-bottom:2px solid var(--g); font-weight:600; color:var(--g); cursor:pointer;">Entrar</button>
+          <button type="button" id="tabRegister" onclick="switchAuthTab('register')" style="flex:1; padding:10px; background:none; border:none; border-bottom:2px solid transparent; font-weight:500; color:var(--mut); cursor:pointer;">Criar Conta</button>
+        </div>
+
+        <div id="authError" style="display:none; padding:10px 14px; background:var(--red-light); color:var(--red); border-radius:var(--radius-md); font-size:13px; margin-bottom:16px;"></div>
+
+        <!-- Form Login -->
+        <form id="loginForm" onsubmit="handleLogin(event)" novalidate style="display:flex; flex-direction:column; gap:14px;">
+          <div class="field">
+            <label>Nome de Usuário</label>
+            <input type="text" id="loginUsername" required placeholder="Ex: vmarconi ou admin" value="vmarconi" autocomplete="username">
+          </div>
+          <div class="field">
+            <label>Senha</label>
+            <input type="password" id="loginPassword" required placeholder="Sua senha" value="VMarconi@2026!" autocomplete="current-password">
+          </div>
+          <button type="submit" id="btnLoginSubmit" class="btn primary" style="padding:11px; margin-top:6px;">Acessar Sistema</button>
+        </form>
+
+        <!-- Form Cadastro (Sem E-mail) -->
+        <form id="registerForm" onsubmit="handleRegister(event)" novalidate style="display:none; flex-direction:column; gap:14px;">
+          <div class="field">
+            <label>Nome Completo</label>
+            <input type="text" id="regFullName" required placeholder="Ex: Vinícius Marconi Vieira">
+          </div>
+          <div class="field">
+            <label>Nome de Usuário (login)</label>
+            <input type="text" id="regUsername" required placeholder="Ex: vmarconi" pattern="[a-zA-Z0-9_.-]+">
+          </div>
+          <div class="field">
+            <label>Senha (mínimo 6 caracteres)</label>
+            <input type="password" id="regPassword" required minlength="6" placeholder="Crie sua senha">
+          </div>
+          <div class="field">
+            <label>Confirmar Senha</label>
+            <input type="password" id="regPasswordConfirm" required minlength="6" placeholder="Repita a senha">
+          </div>
+          <button type="submit" id="btnRegSubmit" class="btn primary" style="padding:11px; margin-top:6px;">Criar Meu Usuário</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIDEBAR NAVIGATION -->
+  <aside class="side" id="side">
+    <div class="sidehead">
+      <div class="brand">
+        <div class="brand-badge">
+          <svg class="svg-icon"><use href="#icon-clock"/></svg>
+        </div>
+        <span>Banco de Horas</span>
+      </div>
+      <button onclick="toggleSide()" title="Alternar menu">
+        <svg class="svg-icon"><use href="#icon-menu"/></svg>
+      </button>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-group-label">Principal</div>
+      <button class="active" onclick="showView('v-dashboard', this)">
+        <svg class="svg-icon"><use href="#icon-dashboard"/></svg>
+        <span class="nav-label">Dashboard & Horas</span>
+      </button>
+      <button onclick="showView('v-point', this)">
+        <svg class="svg-icon"><use href="#icon-calendar"/></svg>
+        <span class="nav-label">Cartão Ponto</span>
+      </button>
+      <button onclick="showView('v-sim', this)">
+        <svg class="svg-icon"><use href="#icon-clock"/></svg>
+        <span class="nav-label">Simulação de Saldo</span>
+      </button>
+      <button onclick="showView('v-plan', this)">
+        <svg class="svg-icon"><use href="#icon-target"/></svg>
+        <span class="nav-label">Planejamento</span>
+      </button>
+
+      <!-- Admin Tab (Only visible to admin role) -->
+      <div id="adminNavGroup" style="display:none;">
+        <div class="nav-group-label">Gestão</div>
+        <button id="btnNavAdmin" onclick="showView('v-admin', this)">
+          <svg class="svg-icon"><use href="#icon-shield"/></svg>
+          <span class="nav-label">Painel Admin</span>
+        </button>
+      </div>
+
+      <div class="nav-group-label">Ferramentas</div>
+      <button onclick="openImportModal()">
+        <svg class="svg-icon"><use href="#icon-upload"/></svg>
+        <span class="nav-label">Importar Ponto CSV</span>
+      </button>
+      <button onclick="exportCSV()">
+        <svg class="svg-icon"><use href="#icon-download"/></svg>
+        <span class="nav-label">Exportar Base CSV</span>
+      </button>
+    </nav>
+
+    <div class="sidefoot">
+      <div class="user-chip" onclick="toggleUserDropdown(event)">
+        <div class="user-avatar" id="sideAvatar">VM</div>
+        <div class="user-meta">
+          <div class="name" id="sideUserName">Vinícius Marconi</div>
+          <div class="role-pill" id="sideUserRole">Administrador</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN APP CONTAINER -->
+  <div class="main" id="main">
+    
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="btn secondary icon-only" onclick="toggleSide()" style="display:none;" id="mobileMenuBtn">
+          <svg class="svg-icon"><use href="#icon-menu"/></svg>
+        </button>
+        <h1 class="page-title" id="pageTitle">Dashboard & Horas</h1>
+      </div>
+
+      <div class="topbar-right">
+        <!-- Live Sync & Network Pill -->
+        <div class="status-pill online" id="syncStatusPill" title="Status de sincronização com o Supabase">
+          <span class="pulse-dot"></span>
+          <span id="syncStatusText">Online</span>
+        </div>
+
+        <!-- Dark mode button -->
+        <button class="btn secondary icon-only" onclick="toggleDarkMode()" title="Alternar tema claro/escuro">
+          <svg class="svg-icon" id="themeIcon"><use href="#icon-moon"/></svg>
+        </button>
+
+        <!-- User profile button -->
+        <button class="btn secondary" onclick="toggleUserDropdown(event)">
+          <span id="topbarUsername">@vmarconi</span>
+          <svg class="svg-icon sm"><use href="#icon-settings"/></svg>
+        </button>
+      </div>
+
+      <!-- User Dropdown Menu -->
+      <div class="dropdown-menu" id="userDropdown">
+        <button class="dropdown-item" onclick="openChangePasswordModal()">
+          <svg class="svg-icon sm"><use href="#icon-key"/></svg>
+          <span>Alterar Minha Senha</span>
+        </button>
+        <button class="dropdown-item" onclick="manualForceSync()">
+          <svg class="svg-icon sm"><use href="#icon-refresh"/></svg>
+          <span>Sincronizar Agora</span>
+        </button>
+        <div class="dropdown-divider"></div>
+        <button class="dropdown-item" style="color:var(--red);" onclick="handleLogout()">
+          <svg class="svg-icon sm"><use href="#icon-logout"/></svg>
+          <span>Sair da Conta</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- VIEWS CONTENT -->
+    <main class="content">
+
+      <!-- VIEW 1: DASHBOARD & ENTRIES -->
+      <section class="view active" id="v-dashboard">
+        <!-- Top KPI Cards -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-head">
+              <span class="kpi-label">Saldo Acumulado</span>
+              <div class="kpi-icon-wrap"><svg class="svg-icon"><use href="#icon-clock"/></svg></div>
+            </div>
+            <div class="kpi-val" id="kpiSaldoTotal">+00:00</div>
+            <div class="kpi-sub">Total de horas conciliadas</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-head">
+              <span class="kpi-label">Mês Vigente</span>
+              <div class="kpi-icon-wrap"><svg class="svg-icon"><use href="#icon-calendar"/></svg></div>
+            </div>
+            <div class="kpi-val" id="kpiSaldoMes">+00:00</div>
+            <div class="kpi-sub" id="kpiNomeMes">Outubro / 2026</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-head">
+              <span class="kpi-label">Lançamentos</span>
+              <div class="kpi-icon-wrap"><svg class="svg-icon"><use href="#icon-dashboard"/></svg></div>
+            </div>
+            <div class="kpi-val" id="kpiCountLancamentos">0</div>
+            <div class="kpi-sub">Dias cadastrados</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-head">
+              <span class="kpi-label">Créditos de Ponto</span>
+              <div class="kpi-icon-wrap"><svg class="svg-icon"><use href="#icon-plus"/></svg></div>
+            </div>
+            <div class="kpi-val" id="kpiCreditosPonto">0</div>
+            <div class="kpi-sub">Pendentes de lançar</div>
+          </div>
+        </div>
+
+        <!-- Quick Add Entry Card -->
+        <div class="card">
+          <div class="card-head">
+            <h2 class="card-title"><svg class="svg-icon"><use href="#icon-plus"/></svg> Novo Lançamento de Horas</h2>
+            <button class="btn secondary" type="button" onclick="openImportModal()">
+              <svg class="svg-icon sm"><use href="#icon-upload"/></svg> Importar Espelho CSV
+            </button>
+          </div>
+          <form onsubmit="handleSaveEntry(event)" class="formgrid">
+            <div class="field">
+              <label>Data</label>
+              <input type="date" id="entryDate" required>
+            </div>
+            <div class="field">
+              <label>Entrada 1</label>
+              <input type="time" id="entryIn1">
+            </div>
+            <div class="field">
+              <label>Saída 1</label>
+              <input type="time" id="entryOut1">
+            </div>
+            <div class="field">
+              <label>Entrada 2</label>
+              <input type="time" id="entryIn2">
+            </div>
+            <div class="field">
+              <label>Saída 2</label>
+              <input type="time" id="entryOut2">
+            </div>
+            <div class="field">
+              <label>Horas 100% (Dobra)</label>
+              <select id="entryDouble">
+                <option value="false">Não (Normal)</option>
+                <option value="true">Sim (Domingo/Feriado)</option>
+              </select>
+            </div>
+            <div class="field">
+              <button class="btn primary" type="submit">Salvar Dia</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Table of Entries -->
+        <div class="card">
+          <div class="card-head">
+            <h2 class="card-title"><svg class="svg-icon"><use href="#icon-dashboard"/></svg> Histórico de Lançamentos</h2>
+            <div style="display:flex; gap:8px;">
+              <button class="btn secondary" onclick="exportCSV()"><svg class="svg-icon sm"><use href="#icon-download"/></svg> Exportar CSV</button>
+              <button class="btn danger" onclick="handleClearAll()"><svg class="svg-icon sm"><use href="#icon-trash"/></svg> Limpar Base</button>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Dia</th>
+                  <th>Entrada 1</th>
+                  <th>Saída 1</th>
+                  <th>Entrada 2</th>
+                  <th>Saída 2</th>
+                  <th>Trabalhado</th>
+                  <th>Saldo</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="entriesTableBody">
+                <tr><td colspan="9" style="text-align:center; padding:28px; color:var(--mut);">Carregando lançamentos...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 2: CARTÃO PONTO (ESPELHO) -->
+      <section class="view" id="v-point">
+        <div class="card">
+          <div class="card-head">
+            <h2 class="card-title"><svg class="svg-icon"><use href="#icon-calendar"/></svg> Espelho de Ponto Oficial</h2>
+            <div style="display:flex; gap:8px;">
+              <button class="btn primary" onclick="openImportModal()"><svg class="svg-icon sm"><use href="#icon-upload"/></svg> Importar Arquivo ("Outubro.csv")</button>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Dia</th>
+                  <th>Batidas Importadas</th>
+                  <th>Total Ponto</th>
+                  <th>Saldo</th>
+                  <th>Status Conciliação</th>
+                  <th>Ação</th>
+                </tr>
+              </thead>
+              <tbody id="pointTableBody">
+                <tr><td colspan="7" style="text-align:center; padding:28px; color:var(--mut);">Nenhum arquivo de cartão ponto importado ainda. Clique em "Importar Arquivo".</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 3: SIMULAÇÃO -->
+      <section class="view" id="v-sim">
+        <div class="card">
+          <div class="card-head">
+            <h2 class="card-title"><svg class="svg-icon"><use href="#icon-clock"/></svg> Simulação e Projeção de Compensação</h2>
+          </div>
+          <div class="formgrid">
+            <div class="field">
+              <label>Minutos Extras por Dia a Trabalhar</label>
+              <input type="number" id="simDailyMinutes" value="30" step="5" min="5" max="240">
+            </div>
+            <div class="field">
+              <label>Dias Úteis Disponíveis</label>
+              <input type="number" id="simDaysAvailable" value="20" min="1" max="60">
+            </div>
+            <div class="field">
+              <button class="btn primary" type="button" onclick="calculateSimulation()">Projetar Saldo</button>
+            </div>
+          </div>
+          <div style="margin-top:20px; padding:18px; background:var(--surface-2); border-radius:var(--radius-md); border:1px solid var(--line);">
+            <h4 style="margin:0 0 8px; font-size:14px; color:var(--txt);">Resultado da Projeção:</h4>
+            <div id="simResult" style="font-size:16px; font-weight:600; color:var(--g);">Preencha os valores e clique em Projetar Saldo.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 4: PLANEJAMENTO -->
+      <section class="view" id="v-plan">
+        <div class="card">
+          <div class="card-head">
+            <h2 class="card-title"><svg class="svg-icon"><use href="#icon-target"/></svg> Metas e Planejamento de Folgas</h2>
+          </div>
+          <form onsubmit="handleSavePlan(event)" class="formgrid">
+            <div class="field">
+              <label>Data Prevista</label>
+              <input type="date" id="planDate" required>
+            </div>
+            <div class="field">
+              <label>Tipo</label>
+              <select id="planType">
+                <option value="folga">Folga Compensatória</option>
+                <option value="saida_antecipada">Saída Antecipada</option>
+                <option value="hora_extra">Plantão Extra</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Horas Previstas</label>
+              <input type="number" id="planHours" value="8" step="0.5" min="0.5" max="16" required>
+            </div>
+            <div class="field">
+              <button class="btn primary" type="submit">Agendar Meta</button>
+            </div>
+          </form>
+          <div class="table-responsive" style="margin-top:20px;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Tipo</th>
+                  <th>Horas</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="planTableBody">
+                <tr><td colspan="4" style="text-align:center; padding:20px; color:var(--mut);">Nenhuma meta planejada.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 5: ADMIN CONTROLS (DEDICATED ADMIN TAB) -->
+      <section class="view" id="v-admin">
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-head">
+              <span class="kpi-label">Total Usuários</span>
+              <div class="kpi-icon-wrap"><svg class="svg-icon"><use href="#icon-users"/></svg></div>
+            </div>
+            <div class="kpi-val" id="admKpiUsers">0</div>
+            <div class="kpi-sub">Contas cadastradas</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-head">
+              <span class="kpi-label">Administradores</span>
+              <div class="kpi-icon-wrap"><svg class="svg-icon"><use href="#icon-shield"/></svg></div>
+            </div>
+            <div class="kpi-val" id="admKpiAdmins">0</div>
+            <div class="kpi-sub">Com acesso total</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-head">
+              <span class="kpi-label">Registros Globais</span>
+              <div class="kpi-icon-wrap"><svg class="svg-icon"><use href="#icon-dashboard"/></svg></div>
+            </div>
+            <div class="kpi-val" id="admKpiEntries">0</div>
+            <div class="kpi-sub">Lançamentos no Supabase</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-head">
+              <span class="kpi-label">Segurança RLS</span>
+              <div class="kpi-icon-wrap"><svg class="svg-icon"><use href="#icon-check"/></svg></div>
+            </div>
+            <div class="kpi-val" style="color:var(--g); font-size:20px;">Ativa</div>
+            <div class="kpi-sub">Isolamento rigoroso por UID</div>
+          </div>
+        </div>
+
+        <!-- Add User by Admin Card -->
+        <div class="card">
+          <div class="card-head">
+            <h2 class="card-title"><svg class="svg-icon"><use href="#icon-plus"/></svg> Cadastrar Novo Colaborador</h2>
+          </div>
+          <form onsubmit="handleAdminCreateUser(event)" class="formgrid">
+            <div class="field">
+              <label>Nome Completo</label>
+              <input type="text" id="admNewFullName" required placeholder="Ex: Roberto Ramos">
+            </div>
+            <div class="field">
+              <label>Nome de Usuário (login)</label>
+              <input type="text" id="admNewUsername" required placeholder="Ex: roberto" pattern="[a-zA-Z0-9_.-]+">
+            </div>
+            <div class="field">
+              <label>Senha Provisória</label>
+              <input type="password" id="admNewPassword" required minlength="6" placeholder="Mínimo 6 chars">
+            </div>
+            <div class="field">
+              <label>Perfil</label>
+              <select id="admNewRole">
+                <option value="user">Usuário Comum</option>
+                <option value="admin">Administrador</option>
+              </select>
+            </div>
+            <div class="field">
+              <button class="btn primary" type="submit">Cadastrar no Banco</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Users Directory Table -->
+        <div class="card">
+          <div class="card-head">
+            <h2 class="card-title"><svg class="svg-icon"><use href="#icon-users"/></svg> Diretório de Usuários</h2>
+            <div style="display:flex; gap:10px; align-items:center;">
+              <div class="field" style="margin:0;">
+                <input type="text" id="admUserSearch" placeholder="Buscar usuário..." oninput="filterAdminUsers()" style="padding:6px 12px; font-size:12.5px;">
+              </div>
+              <button class="btn secondary icon-only" onclick="loadAdminUsers()" title="Atualizar Lista">
+                <svg class="svg-icon sm"><use href="#icon-refresh"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Usuário</th>
+                  <th>Nome Completo</th>
+                  <th>Perfil</th>
+                  <th>Data Cadastro</th>
+                  <th>Lançamentos</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="admUsersTableBody">
+                <tr><td colspan="6" style="text-align:center; padding:24px; color:var(--mut);">Carregando usuários...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- MODAL: IMPORT CSV / CARTAO PONTO -->
+  <div class="modal-backdrop" id="importModal">
+    <div class="modal-box wide">
+      <div class="modal-header">
+        <h3><svg class="svg-icon"><use href="#icon-upload"/></svg> Importar Arquivo de Cartão Ponto</h3>
+        <button class="modal-close-btn" onclick="closeImportModal()"><svg class="svg-icon"><use href="#icon-close"/></svg></button>
+      </div>
+      <div class="modal-body">
+        <div class="drop-zone" onclick="$('importFileInput').click()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+          <svg class="svg-icon lg" style="stroke:var(--g); margin-bottom:8px;"><use href="#icon-upload"/></svg>
+          <div style="font-weight:600; font-size:14px; margin-bottom:4px;">Arraste e solte o arquivo ("Outubro.csv") aqui</div>
+          <div style="font-size:12.5px; color:var(--mut);">Ou clique para selecionar arquivos .csv, .txt ou .json</div>
+          <input type="file" id="importFileInput" accept=".csv,.txt,.json" onchange="handleFileSelect(event)" style="display:none;">
+        </div>
+
+        <div style="margin-top:16px;">
+          <div class="field">
+            <label>Ou cole o conteúdo de texto do cartão ponto:</label>
+            <textarea id="importRawText" rows="6" placeholder="Data;Entrada 1;Saída 1;Entrada 2;Saída 2...&#10;01/10/2026;08:00;12:00;13:00;18:00" style="font-family:monospace; font-size:12.5px;"></textarea>
+          </div>
+        </div>
+
+        <!-- Preview Results Table -->
+        <div id="importPreviewArea" style="display:none; margin-top:16px;">
+          <h4 style="margin:0 0 8px; font-size:13.5px; color:var(--txt); display:flex; justify-content:space-between;">
+            <span>Pré-visualização dos Lançamentos Detectados:</span>
+            <span id="importCountBadge" class="badge positive">0 dias</span>
+          </h4>
+          <div class="table-responsive" style="max-height:220px; overflow-y:auto;">
+            <table class="data-table" id="importPreviewTable">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>E1</th>
+                  <th>S1</th>
+                  <th>E2</th>
+                  <th>S2</th>
+                  <th>Trabalhado</th>
+                  <th>Saldo Previsto</th>
+                </tr>
+              </thead>
+              <tbody id="importPreviewBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn secondary" onclick="closeImportModal()">Cancelar</button>
+        <button class="btn secondary" onclick="parseRawInput()">Analisar Conteúdo</button>
+        <button class="btn primary" id="btnConfirmImport" onclick="executeImport()" disabled>Confirmar e Sincronizar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ALTERAR MINHA SENHA -->
+  <div class="modal-backdrop" id="changePasswordModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3><svg class="svg-icon"><use href="#icon-key"/></svg> Alterar Minha Senha</h3>
+        <button class="modal-close-btn" onclick="closeChangePasswordModal()"><svg class="svg-icon"><use href="#icon-close"/></svg></button>
+      </div>
+      <form onsubmit="handleSelfPasswordChange(event)" novalidate>
+        <div class="modal-body" style="display:flex; flex-direction:column; gap:14px;">
+          <div class="field">
+            <label>Nova Senha</label>
+            <input type="password" id="selfNewPassword" required minlength="6" placeholder="Mínimo 6 caracteres">
+          </div>
+          <div class="field">
+            <label>Confirmar Nova Senha</label>
+            <input type="password" id="selfConfirmPassword" required minlength="6" placeholder="Repita a nova senha">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn secondary" onclick="closeChangePasswordModal()">Cancelar</button>
+          <button type="submit" class="btn primary">Salvar Nova Senha</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADMIN RESET SENHA DE USUARIO -->
+  <div class="modal-backdrop" id="admResetModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3><svg class="svg-icon"><use href="#icon-key"/></svg> Redefinir Senha de Usuário</h3>
+        <button class="modal-close-btn" onclick="closeAdminResetModal()"><svg class="svg-icon"><use href="#icon-close"/></svg></button>
+      </div>
+      <form onsubmit="handleConfirmAdminReset(event)" novalidate>
+        <div class="modal-body" style="display:flex; flex-direction:column; gap:14px;">
+          <input type="hidden" id="admResetUserId">
+          <div class="field">
+            <label>Usuário Alvo</label>
+            <input type="text" id="admResetUserName" readonly style="background:var(--surface-2);">
+          </div>
+          <div class="field">
+            <label>Nova Senha Provisória</label>
+            <input type="password" id="admResetNewPass" required minlength="6" placeholder="Digite a nova senha">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn secondary" onclick="closeAdminResetModal()">Cancelar</button>
+          <button type="submit" class="btn primary">Confirmar Redefinição</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- APPLICATION JAVASCRIPT -->
+  <script src="js/supabase.js"></script>
+  <script src="js/offline.js"></script>
+  <script src="js/parser.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

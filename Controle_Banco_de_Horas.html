@@ -1,0 +1,2405 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f6b45">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Banco de Horas">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <title>Controle de Banco de Horas</title>
+  
+  <style>
+  :root {
+    --g: #0f6b45;
+    --g-hover: #0c5637;
+    --g-light: #e8f5ee;
+    --gd: #13251f;
+    --gd-surface: #19332b;
+    --line: #e2ebe5;
+    --txt: #14241d;
+    --mut: #5e7368;
+    --surface: #ffffff;
+    --surface-2: #f8faf9;
+    --page: #edf4ef;
+    --red: #b91c1c;
+    --red-light: #fee2e2;
+    --amber: #b45309;
+    --amber-light: #fef3c7;
+    --blue: #1d4ed8;
+    --blue-light: #dbeafe;
+    --shadow: 0 10px 28px rgba(19, 37, 31, .07);
+    --shadow-sm: 0 2px 8px rgba(19, 37, 31, .05);
+    --ring: 0 0 0 3px rgba(15, 107, 69, .16);
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --radius-xl: 22px;
+    --sw: 260px;
+    --sn: 72px;
+  }
+
+  body.dark {
+    --g: #10b981;
+    --g-hover: #059669;
+    --g-light: #132e23;
+    --gd: #0a1410;
+    --gd-surface: #11221b;
+    --line: #223c31;
+    --txt: #e6f1ec;
+    --mut: #8aa598;
+    --surface: #142820;
+    --surface-2: #102019;
+    --page: #0b1712;
+    --red-light: #3d1416;
+    --amber-light: #3b2810;
+    --blue-light: #132845;
+    --shadow: 0 10px 28px rgba(0, 0, 0, .4);
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, .3);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--page);
+    color: var(--txt);
+    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    letter-spacing: -0.015em;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  button, input, select, textarea { font: inherit; }
+
+  /* SVG Icons */
+  .svg-icon {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    stroke-width: 2;
+    stroke: currentColor;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vertical-align: middle;
+    flex-shrink: 0;
+  }
+  .svg-icon.sm { width: 15px; height: 15px; }
+  .svg-icon.lg { width: 22px; height: 22px; }
+
+  /* Sidebar */
+  .side {
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: var(--sw);
+    background: linear-gradient(180deg, #13251f 0%, #0d1a15 100%);
+    color: white;
+    z-index: 40;
+    transition: width .2s ease, transform .2s ease;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .sidehead {
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 18px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: -0.02em;
+    color: #ffffff;
+    white-space: nowrap;
+  }
+  .brand-badge {
+    width: 32px;
+    height: 32px;
+    background: #0f6b45;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+  }
+  .sidehead button {
+    background: transparent;
+    border: none;
+    color: #9cb8a9;
+    padding: 6px;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+  }
+  .sidehead button:hover { color: white; background: rgba(255, 255, 255, 0.08); }
+
+  .nav {
+    flex: 1;
+    padding: 14px 10px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .nav-group-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #6d887a;
+    padding: 12px 10px 4px;
+    white-space: nowrap;
+  }
+  .nav button {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    background: transparent;
+    border: none;
+    color: #b1cebe;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: 13.5px;
+    font-weight: 500;
+    transition: all .15s ease;
+    text-align: left;
+    white-space: nowrap;
+  }
+  .nav button:hover {
+    background: rgba(255, 255, 255, 0.07);
+    color: #ffffff;
+  }
+  .nav button.active {
+    background: #0f6b45;
+    color: #ffffff;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(15, 107, 69, 0.35);
+  }
+
+  .sidefoot {
+    padding: 14px 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .user-chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: background .15s ease;
+  }
+  .user-chip:hover { background: rgba(255, 255, 255, 0.1); }
+  .user-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: #0f6b45;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+  .user-meta {
+    overflow: hidden;
+    line-height: 1.25;
+  }
+  .user-meta .name {
+    font-size: 13px;
+    font-weight: 600;
+    color: white;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .user-meta .role-pill {
+    font-size: 11px;
+    color: #8db59f;
+  }
+
+  /* Compact collapsed sidebar */
+  body.side-collapsed .side { width: var(--sn); }
+  body.side-collapsed .brand span,
+  body.side-collapsed .nav-group-label,
+  body.side-collapsed .nav button .nav-label,
+  body.side-collapsed .user-meta { display: none; }
+  body.side-collapsed .main { margin-left: var(--sn); }
+
+  /* Main Wrapper */
+  .main {
+    margin-left: var(--sw);
+    min-height: 100vh;
+    transition: margin-left .2s ease;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Header */
+  .topbar {
+    height: 68px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    backdrop-filter: blur(8px);
+  }
+  .topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .page-title {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0;
+  }
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* Network / Sync Status Pill */
+  .status-pill {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 500;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    color: var(--mut);
+    transition: all .2s ease;
+  }
+  .status-pill.online { color: #0f6b45; background: var(--g-light); border-color: transparent; }
+  .status-pill.offline { color: var(--amber); background: var(--amber-light); border-color: transparent; }
+  .status-pill.syncing { color: var(--blue); background: var(--blue-light); border-color: transparent; }
+  .pulse-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    display: inline-block;
+  }
+  .status-pill.syncing .pulse-dot {
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin { 100% { transform: rotate(360deg); } }
+
+  /* Action Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 8px 14px;
+    border-radius: var(--radius-md);
+    font-size: 13.5px;
+    font-weight: 600;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all .15s ease;
+    text-decoration: none;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+  .btn.primary {
+    background: var(--g);
+    color: white;
+    box-shadow: 0 2px 6px rgba(15, 107, 69, 0.2);
+  }
+  .btn.primary:hover { background: var(--g-hover); }
+  .btn.secondary {
+    background: var(--surface);
+    color: var(--txt);
+    border-color: var(--line);
+  }
+  .btn.secondary:hover { background: var(--surface-2); border-color: #c9dbd0; }
+  .btn.danger {
+    background: var(--surface);
+    color: var(--red);
+    border-color: #fecaca;
+  }
+  .btn.danger:hover { background: var(--red-light); }
+  .btn.icon-only { padding: 8px; border-radius: var(--radius-md); }
+
+  /* Content area */
+  .content {
+    flex: 1;
+    padding: 24px;
+    max-width: 1440px;
+    width: 100%;
+    margin: 0 auto;
+  }
+  .view { display: none; }
+  .view.active { display: block; animation: fadeIn .2s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* KPI Grid */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 16px;
+    margin-bottom: 22px;
+  }
+  .kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    overflow: hidden;
+  }
+  .kpi-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .kpi-label {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--mut);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .kpi-icon-wrap {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface-2);
+    color: var(--g);
+  }
+  .kpi-val {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--txt);
+    margin: 0;
+  }
+  .kpi-sub {
+    font-size: 12px;
+    color: var(--mut);
+    margin-top: 4px;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 22px;
+  }
+  .card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .card-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+
+  /* Tables */
+  .table-responsive {
+    overflow-x: auto;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--line);
+  }
+  table.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    text-align: left;
+    background: var(--surface);
+  }
+  table.data-table th {
+    background: var(--surface-2);
+    padding: 11px 14px;
+    font-weight: 600;
+    color: var(--mut);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid var(--line);
+    white-space: nowrap;
+  }
+  table.data-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--line);
+    color: var(--txt);
+    vertical-align: middle;
+  }
+  table.data-table tbody tr:last-child td { border-bottom: none; }
+  table.data-table tbody tr:hover { background: rgba(15, 107, 69, 0.03); }
+
+  /* Badge Pills */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+  .badge.positive { background: #dcfce7; color: #15803d; }
+  .badge.negative { background: #fee2e2; color: #b91c1c; }
+  .badge.neutral { background: #f1f5f9; color: #475569; }
+  .badge.admin { background: #fef3c7; color: #b45309; }
+  .badge.user { background: #e0e7ff; color: #3730a3; }
+
+  /* Form Elements */
+  .formgrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+    align-items: flex-end;
+  }
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .field label {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--mut);
+  }
+  .field input, .field select, .field textarea {
+    padding: 9px 12px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--txt);
+    font-size: 13.5px;
+    transition: all .15s ease;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    outline: none;
+    border-color: var(--g);
+    box-shadow: var(--ring);
+  }
+
+  /* Modals */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 20, 16, 0.65);
+    backdrop-filter: blur(5px);
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-backdrop.open { display: flex; animation: fadeIn .15s ease; }
+  .modal-box {
+    background: var(--surface);
+    border-radius: var(--radius-xl);
+    width: 100%;
+    max-width: 540px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--line);
+    overflow: hidden;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .modal-box.wide { max-width: 780px; }
+  .modal-header {
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .modal-header h3 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .modal-close-btn {
+    background: transparent;
+    border: none;
+    color: var(--mut);
+    padding: 6px;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+  }
+  .modal-close-btn:hover { background: var(--surface-2); color: var(--txt); }
+  .modal-body {
+    padding: 22px;
+    overflow-y: auto;
+  }
+  .modal-footer {
+    padding: 16px 22px;
+    border-top: 1px solid var(--line);
+    background: var(--surface-2);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+
+  /* Dropdown User Menu */
+  .dropdown-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 24px;
+    width: 230px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    padding: 6px;
+    display: none;
+    z-index: 50;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .dropdown-menu.open { display: flex; animation: fadeIn .15s ease; }
+  .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--txt);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    text-align: left;
+    width: 100%;
+    transition: background .15s ease;
+  }
+  .dropdown-item:hover { background: var(--surface-2); }
+  .dropdown-divider { height: 1px; background: var(--line); margin: 4px 0; }
+
+  /* Toast notification */
+  .toast-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+  }
+  .toast {
+    background: #13251f;
+    color: white;
+    padding: 12px 18px;
+    border-radius: var(--radius-md);
+    font-size: 13.5px;
+    font-weight: 500;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: toastIn .2s ease forwards;
+    pointer-events: auto;
+  }
+  .toast.success { background: #0f6b45; }
+  .toast.error { background: #991b1b; }
+  .toast.warning { background: #92400e; }
+  @keyframes toastIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Drag and drop zone for CSV */
+  .drop-zone {
+    border: 2px dashed #c1d6c9;
+    border-radius: var(--radius-lg);
+    padding: 28px 20px;
+    text-align: center;
+    background: var(--surface-2);
+    cursor: pointer;
+    transition: all .2s ease;
+  }
+  .drop-zone:hover, .drop-zone.dragover {
+    border-color: var(--g);
+    background: var(--g-light);
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .side { transform: translateX(-100%); width: var(--sw); }
+    body.side-open .side { transform: translateX(0); }
+    .main { margin-left: 0 !important; }
+    .topbar { padding: 0 16px; }
+    .content { padding: 16px; }
+  }
+  </style>
+</head>
+<body>
+
+  <!-- SVG SPRITES INLINE -->
+  <svg style="display:none;">
+    <defs>
+      <g id="icon-clock"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></g>
+      <g id="icon-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></g>
+      <g id="icon-dashboard"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></g>
+      <g id="icon-users"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></g>
+      <g id="icon-shield"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></g>
+      <g id="icon-plus"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></g>
+      <g id="icon-trash"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></g>
+      <g id="icon-key"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></g>
+      <g id="icon-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></g>
+      <g id="icon-upload"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></g>
+      <g id="icon-wifi"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></g>
+      <g id="icon-wifi-off"><line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.58 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></g>
+      <g id="icon-refresh"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></g>
+      <g id="icon-check"><polyline points="20 6 9 17 4 12"/></g>
+      <g id="icon-alert"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></g>
+      <g id="icon-moon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></g>
+      <g id="icon-sun"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></g>
+      <g id="icon-settings"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></g>
+      <g id="icon-logout"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></g>
+      <g id="icon-menu"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></g>
+      <g id="icon-close"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></g>
+      <g id="icon-search"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></g>
+      <g id="icon-target"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></g>
+    </defs>
+  </svg>
+
+  <!-- AUTH SCREEN (NO EMAIL) -->
+  <div class="modal-backdrop open" id="authBackdrop" style="background:#0d1a15; z-index:150;">
+    <div class="modal-box" style="max-width:440px; padding:0;">
+      <div style="background:linear-gradient(135deg, #13251f 0%, #0f6b45 100%); padding:28px 24px; color:white; text-align:center;">
+        <div class="brand-badge" style="width:48px; height:48px; margin:0 auto 12px; background:rgba(255,255,255,0.18);">
+          <svg class="svg-icon lg" style="stroke:white;"><use href="#icon-clock"/></svg>
+        </div>
+        <h2 style="margin:0 0 4px; font-size:20px; font-weight:700; letter-spacing:-0.02em;">Banco de Horas</h2>
+        <p style="margin:0; font-size:13px; color:#cbe3d6;">Acesso seguro e sincronização em nuvem</p>
+      </div>
+
+      <div style="padding:22px;">
+        <div style="display:flex; border-bottom:1px solid var(--line); margin-bottom:18px;">
+          <button type="button" id="tabLogin" onclick="switchAuthTab('login')" style="flex:1; padding:10px; background:none; border:none; border-bottom:2px solid var(--g); font-weight:600; color:var(--g); cursor:pointer;">Entrar</button>
+          <button type="button" id="tabRegister" onclick="switchAuthTab('register')" style="flex:1; padding:10px; background:none; border:none; border-bottom:2px solid transparent; font-weight:500; color:var(--mut); cursor:pointer;">Criar Conta</button>
+        </div>
+
+        <div id="authError" style="display:none; padding:10px 14px; background:var(--red-light); color:var(--red); border-radius:var(--radius-md); font-size:13px; margin-bottom:16px;"></div>
+
+        <!-- Form Login -->
+        <form id="loginForm" onsubmit="handleLogin(event)" novalidate style="display:flex; flex-direction:column; gap:14px;">
+          <div class="field">
+            <label>Nome de Usuário</label>
+            <input type="text" id="loginUsername" required placeholder="Ex: vmarconi ou admin" value="vmarconi" autocomplete="username">
+          </div>
+          <div class="field">
+            <label>Senha</label>
+            <input type="password" id="loginPassword" required placeholder="Sua senha" value="VMarconi@2026!" autocomplete="current-password">
+          </div>
+          <button type="submit" id="btnLoginSubmit" class="btn primary" style="padding:11px; margin-top:6px;">Acessar Sistema</button>
+        </form>
+
+        <!-- Form Cadastro (Sem E-mail) -->
+        <form id="registerForm" onsubmit="handleRegister(event)" novalidate style="display:none; flex-direction:column; gap:14px;">
+          <div class="field">
+            <label>Nome Completo</label>
+            <input type="text" id="regFullName" required placeholder="Ex: Vinícius Marconi Vieira">
+          </div>
+          <div class="field">
+            <label>Nome de Usuário (login)</label>
+            <input type="text" id="regUsername" required placeholder="Ex: vmarconi" pattern="[a-zA-Z0-9_.-]+">
+          </div>
+          <div class="field">
+            <label>Senha (mínimo 6 caracteres)</label>
+            <input type="password" id="regPassword" required minlength="6" placeholder="Crie sua senha">
+          </div>
+          <div class="field">
+            <label>Confirmar Senha</label>
+            <input type="password" id="regPasswordConfirm" required minlength="6" placeholder="Repita a senha">
+          </div>
+          <button type="submit" id="btnRegSubmit" class="btn primary" style="padding:11px; margin-top:6px;">Criar Meu Usuário</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIDEBAR NAVIGATION -->
+  <aside class="side" id="side">
+    <div class="sidehead">
+      <div class="brand">
+        <div class="brand-badge">
+          <svg class="svg-icon"><use href="#icon-clock"/></svg>
+        </div>
+        <span>Banco de Horas</span>
+      </div>
+      <button onclick="toggleSide()" title="Alternar menu">
+        <svg class="svg-icon"><use href="#icon-menu"/></svg>
+      </button>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-group-label">Principal</div>
+      <button class="active" onclick="showView('v-dashboard', this)">
+        <svg class="svg-icon"><use href="#icon-dashboard"/></svg>
+        <span class="nav-label">Dashboard & Horas</span>
+      </button>
+      <button onclick="showView('v-point', this)">
+        <svg class="svg-icon"><use href="#icon-calendar"/></svg>
+        <span class="nav-label">Cartão Ponto</span>
+      </button>
+      <button onclick="showView('v-sim', this)">
+        <svg class="svg-icon"><use href="#icon-clock"/></svg>
+        <span class="nav-label">Simulação de Saldo</span>
+      </button>
+      <button onclick="showView('v-plan', this)">
+        <svg class="svg-icon"><use href="#icon-target"/></svg>
+        <span class="nav-label">Planejamento</span>
+      </button>
+
+      <!-- Admin Tab (Only visible to admin role) -->
+      <div id="adminNavGroup" style="display:none;">
+        <div class="nav-group-label">Gestão</div>
+        <button id="btnNavAdmin" onclick="showView('v-admin', this)">
+          <svg class="svg-icon"><use href="#icon-shield"/></svg>
+          <span class="nav-label">Painel Admin</span>
+        </button>
+      </div>
+
+      <div class="nav-group-label">Ferramentas</div>
+      <button onclick="openImportModal()">
+        <svg class="svg-icon"><use href="#icon-upload"/></svg>
+        <span class="nav-label">Importar Ponto CSV</span>
+      </button>
+      <button onclick="exportCSV()">
+        <svg class="svg-icon"><use href="#icon-download"/></svg>
+        <span class="nav-label">Exportar Base CSV</span>
+      </button>
+    </nav>
+
+    <div class="sidefoot">
+      <div class="user-chip" onclick="toggleUserDropdown(event)">
+        <div class="user-avatar" id="sideAvatar">VM</div>
+        <div class="user-meta">
+          <div class="name" id="sideUserName">Vinícius Marconi</div>
+          <div class="role-pill" id="sideUserRole">Administrador</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN APP CONTAINER -->
+  <div class="main" id="main">
+    
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="btn secondary icon-only" onclick="toggleSide()" style="display:none;" id="mobileMenuBtn">
+          <svg class="svg-icon"><use href="#icon-menu"/></svg>
+        </button>
+        <h1 class="page-title" id="pageTitle">Dashboard & Horas</h1>
+      </div>
+
+      <div class="topbar-right">
+        <!-- Live Sync & Network Pill -->
+        <div class="status-pill online" id="syncStatusPill" title="Status de sincronização com o Supabase">
+          <span class="pulse-dot"></span>
+          <span id="syncStatusText">Online</span>
+        </div>
+
+        <!-- Dark mode button -->
+        <button class="btn secondary icon-only" onclick="toggleDarkMode()" title="Alternar tema claro/escuro">
+          <svg class="svg-icon" id="themeIcon"><use href="#icon-moon"/></svg>
+        </button>
+
+        <!-- User profile button -->
+        <button class="btn secondary" onclick="toggleUserDropdown(event)">
+          <span id="topbarUsername">@vmarconi</span>
+          <svg class="svg-icon sm"><use href="#icon-settings"/></svg>
+        </button>
+      </div>
+
+      <!-- User Dropdown Menu -->
+      <div class="dropdown-menu" id="userDropdown">
+        <button class="dropdown-item" onclick="openChangePasswordModal()">
+          <svg class="svg-icon sm"><use href="#icon-key"/></svg>
+          <span>Alterar Minha Senha</span>
+        </button>
+        <button class="dropdown-item" onclick="manualForceSync()">
+          <svg class="svg-icon sm"><use href="#icon-refresh"/></svg>
+          <span>Sincronizar Agora</span>
+        </button>
+        <div class="dropdown-divider"></div>
+        <button class="dropdown-item" style="color:var(--red);" onclick="handleLogout()">
+          <svg class="svg-icon sm"><use href="#icon-logout"/></svg>
+          <span>Sair da Conta</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- VIEWS CONTENT -->
+    <main class="content">
+
+      <!-- VIEW 1: DASHBOARD & ENTRIES -->
+      <section class="view active" id="v-dashboard">
+        <!-- Top KPI Cards -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-head">
+              <span class="kpi-label">Saldo Acumulado</span>
+              <div class="kpi-icon-wrap"><svg class="svg-icon"><use href="#icon-clock"/></svg></div>
+            </div>
+            <div class="kpi-val" id="kpiSaldoTotal">+00:00</div>
+            <div class="kpi-sub">Total de horas conciliadas</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-head">
+              <span class="kpi-label">Mês Vigente</span>
+              <div class="kpi-icon-wrap"><svg class="svg-icon"><use href="#icon-calendar"/></svg></div>
+            </div>
+            <div class="kpi-val" id="kpiSaldoMes">+00:00</div>
+            <div class="kpi-sub" id="kpiNomeMes">Outubro / 2026</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-head">
+              <span class="kpi-label">Lançamentos</span>
+              <div class="kpi-icon-wrap"><svg class="svg-icon"><use href="#icon-dashboard"/></svg></div>
+            </div>
+            <div class="kpi-val" id="kpiCountLancamentos">0</div>
+            <div class="kpi-sub">Dias cadastrados</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-head">
+              <span class="kpi-label">Créditos de Ponto</span>
+              <div class="kpi-icon-wrap"><svg class="svg-icon"><use href="#icon-plus"/></svg></div>
+            </div>
+            <div class="kpi-val" id="kpiCreditosPonto">0</div>
+            <div class="kpi-sub">Pendentes de lançar</div>
+          </div>
+        </div>
+
+        <!-- Quick Add Entry Card -->
+        <div class="card">
+          <div class="card-head">
+            <h2 class="card-title"><svg class="svg-icon"><use href="#icon-plus"/></svg> Novo Lançamento de Horas</h2>
+            <button class="btn secondary" type="button" onclick="openImportModal()">
+              <svg class="svg-icon sm"><use href="#icon-upload"/></svg> Importar Espelho CSV
+            </button>
+          </div>
+          <form onsubmit="handleSaveEntry(event)" class="formgrid">
+            <div class="field">
+              <label>Data</label>
+              <input type="date" id="entryDate" required>
+            </div>
+            <div class="field">
+              <label>Entrada 1</label>
+              <input type="time" id="entryIn1">
+            </div>
+            <div class="field">
+              <label>Saída 1</label>
+              <input type="time" id="entryOut1">
+            </div>
+            <div class="field">
+              <label>Entrada 2</label>
+              <input type="time" id="entryIn2">
+            </div>
+            <div class="field">
+              <label>Saída 2</label>
+              <input type="time" id="entryOut2">
+            </div>
+            <div class="field">
+              <label>Horas 100% (Dobra)</label>
+              <select id="entryDouble">
+                <option value="false">Não (Normal)</option>
+                <option value="true">Sim (Domingo/Feriado)</option>
+              </select>
+            </div>
+            <div class="field">
+              <button class="btn primary" type="submit">Salvar Dia</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Table of Entries -->
+        <div class="card">
+          <div class="card-head">
+            <h2 class="card-title"><svg class="svg-icon"><use href="#icon-dashboard"/></svg> Histórico de Lançamentos</h2>
+            <div style="display:flex; gap:8px;">
+              <button class="btn secondary" onclick="exportCSV()"><svg class="svg-icon sm"><use href="#icon-download"/></svg> Exportar CSV</button>
+              <button class="btn danger" onclick="handleClearAll()"><svg class="svg-icon sm"><use href="#icon-trash"/></svg> Limpar Base</button>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Dia</th>
+                  <th>Entrada 1</th>
+                  <th>Saída 1</th>
+                  <th>Entrada 2</th>
+                  <th>Saída 2</th>
+                  <th>Trabalhado</th>
+                  <th>Saldo</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="entriesTableBody">
+                <tr><td colspan="9" style="text-align:center; padding:28px; color:var(--mut);">Carregando lançamentos...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 2: CARTÃO PONTO (ESPELHO) -->
+      <section class="view" id="v-point">
+        <div class="card">
+          <div class="card-head">
+            <h2 class="card-title"><svg class="svg-icon"><use href="#icon-calendar"/></svg> Espelho de Ponto Oficial</h2>
+            <div style="display:flex; gap:8px;">
+              <button class="btn primary" onclick="openImportModal()"><svg class="svg-icon sm"><use href="#icon-upload"/></svg> Importar Arquivo ("Outubro.csv")</button>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Dia</th>
+                  <th>Batidas Importadas</th>
+                  <th>Total Ponto</th>
+                  <th>Saldo</th>
+                  <th>Status Conciliação</th>
+                  <th>Ação</th>
+                </tr>
+              </thead>
+              <tbody id="pointTableBody">
+                <tr><td colspan="7" style="text-align:center; padding:28px; color:var(--mut);">Nenhum arquivo de cartão ponto importado ainda. Clique em "Importar Arquivo".</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 3: SIMULAÇÃO -->
+      <section class="view" id="v-sim">
+        <div class="card">
+          <div class="card-head">
+            <h2 class="card-title"><svg class="svg-icon"><use href="#icon-clock"/></svg> Simulação e Projeção de Compensação</h2>
+          </div>
+          <div class="formgrid">
+            <div class="field">
+              <label>Minutos Extras por Dia a Trabalhar</label>
+              <input type="number" id="simDailyMinutes" value="30" step="5" min="5" max="240">
+            </div>
+            <div class="field">
+              <label>Dias Úteis Disponíveis</label>
+              <input type="number" id="simDaysAvailable" value="20" min="1" max="60">
+            </div>
+            <div class="field">
+              <button class="btn primary" type="button" onclick="calculateSimulation()">Projetar Saldo</button>
+            </div>
+          </div>
+          <div style="margin-top:20px; padding:18px; background:var(--surface-2); border-radius:var(--radius-md); border:1px solid var(--line);">
+            <h4 style="margin:0 0 8px; font-size:14px; color:var(--txt);">Resultado da Projeção:</h4>
+            <div id="simResult" style="font-size:16px; font-weight:600; color:var(--g);">Preencha os valores e clique em Projetar Saldo.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 4: PLANEJAMENTO -->
+      <section class="view" id="v-plan">
+        <div class="card">
+          <div class="card-head">
+            <h2 class="card-title"><svg class="svg-icon"><use href="#icon-target"/></svg> Metas e Planejamento de Folgas</h2>
+          </div>
+          <form onsubmit="handleSavePlan(event)" class="formgrid">
+            <div class="field">
+              <label>Data Prevista</label>
+              <input type="date" id="planDate" required>
+            </div>
+            <div class="field">
+              <label>Tipo</label>
+              <select id="planType">
+                <option value="folga">Folga Compensatória</option>
+                <option value="saida_antecipada">Saída Antecipada</option>
+                <option value="hora_extra">Plantão Extra</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Horas Previstas</label>
+              <input type="number" id="planHours" value="8" step="0.5" min="0.5" max="16" required>
+            </div>
+            <div class="field">
+              <button class="btn primary" type="submit">Agendar Meta</button>
+            </div>
+          </form>
+          <div class="table-responsive" style="margin-top:20px;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Tipo</th>
+                  <th>Horas</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="planTableBody">
+                <tr><td colspan="4" style="text-align:center; padding:20px; color:var(--mut);">Nenhuma meta planejada.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 5: ADMIN CONTROLS (DEDICATED ADMIN TAB) -->
+      <section class="view" id="v-admin">
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-head">
+              <span class="kpi-label">Total Usuários</span>
+              <div class="kpi-icon-wrap"><svg class="svg-icon"><use href="#icon-users"/></svg></div>
+            </div>
+            <div class="kpi-val" id="admKpiUsers">0</div>
+            <div class="kpi-sub">Contas cadastradas</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-head">
+              <span class="kpi-label">Administradores</span>
+              <div class="kpi-icon-wrap"><svg class="svg-icon"><use href="#icon-shield"/></svg></div>
+            </div>
+            <div class="kpi-val" id="admKpiAdmins">0</div>
+            <div class="kpi-sub">Com acesso total</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-head">
+              <span class="kpi-label">Registros Globais</span>
+              <div class="kpi-icon-wrap"><svg class="svg-icon"><use href="#icon-dashboard"/></svg></div>
+            </div>
+            <div class="kpi-val" id="admKpiEntries">0</div>
+            <div class="kpi-sub">Lançamentos no Supabase</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-head">
+              <span class="kpi-label">Segurança RLS</span>
+              <div class="kpi-icon-wrap"><svg class="svg-icon"><use href="#icon-check"/></svg></div>
+            </div>
+            <div class="kpi-val" style="color:var(--g); font-size:20px;">Ativa</div>
+            <div class="kpi-sub">Isolamento rigoroso por UID</div>
+          </div>
+        </div>
+
+        <!-- Add User by Admin Card -->
+        <div class="card">
+          <div class="card-head">
+            <h2 class="card-title"><svg class="svg-icon"><use href="#icon-plus"/></svg> Cadastrar Novo Colaborador</h2>
+          </div>
+          <form onsubmit="handleAdminCreateUser(event)" class="formgrid">
+            <div class="field">
+              <label>Nome Completo</label>
+              <input type="text" id="admNewFullName" required placeholder="Ex: Roberto Ramos">
+            </div>
+            <div class="field">
+              <label>Nome de Usuário (login)</label>
+              <input type="text" id="admNewUsername" required placeholder="Ex: roberto" pattern="[a-zA-Z0-9_.-]+">
+            </div>
+            <div class="field">
+              <label>Senha Provisória</label>
+              <input type="password" id="admNewPassword" required minlength="6" placeholder="Mínimo 6 chars">
+            </div>
+            <div class="field">
+              <label>Perfil</label>
+              <select id="admNewRole">
+                <option value="user">Usuário Comum</option>
+                <option value="admin">Administrador</option>
+              </select>
+            </div>
+            <div class="field">
+              <button class="btn primary" type="submit">Cadastrar no Banco</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Users Directory Table -->
+        <div class="card">
+          <div class="card-head">
+            <h2 class="card-title"><svg class="svg-icon"><use href="#icon-users"/></svg> Diretório de Usuários</h2>
+            <div style="display:flex; gap:10px; align-items:center;">
+              <div class="field" style="margin:0;">
+                <input type="text" id="admUserSearch" placeholder="Buscar usuário..." oninput="filterAdminUsers()" style="padding:6px 12px; font-size:12.5px;">
+              </div>
+              <button class="btn secondary icon-only" onclick="loadAdminUsers()" title="Atualizar Lista">
+                <svg class="svg-icon sm"><use href="#icon-refresh"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Usuário</th>
+                  <th>Nome Completo</th>
+                  <th>Perfil</th>
+                  <th>Data Cadastro</th>
+                  <th>Lançamentos</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="admUsersTableBody">
+                <tr><td colspan="6" style="text-align:center; padding:24px; color:var(--mut);">Carregando usuários...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- MODAL: IMPORT CSV / CARTAO PONTO -->
+  <div class="modal-backdrop" id="importModal">
+    <div class="modal-box wide">
+      <div class="modal-header">
+        <h3><svg class="svg-icon"><use href="#icon-upload"/></svg> Importar Arquivo de Cartão Ponto</h3>
+        <button class="modal-close-btn" onclick="closeImportModal()"><svg class="svg-icon"><use href="#icon-close"/></svg></button>
+      </div>
+      <div class="modal-body">
+        <div class="drop-zone" onclick="$('importFileInput').click()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+          <svg class="svg-icon lg" style="stroke:var(--g); margin-bottom:8px;"><use href="#icon-upload"/></svg>
+          <div style="font-weight:600; font-size:14px; margin-bottom:4px;">Arraste e solte o arquivo ("Outubro.csv") aqui</div>
+          <div style="font-size:12.5px; color:var(--mut);">Ou clique para selecionar arquivos .csv, .txt ou .json</div>
+          <input type="file" id="importFileInput" accept=".csv,.txt,.json" onchange="handleFileSelect(event)" style="display:none;">
+        </div>
+
+        <div style="margin-top:16px;">
+          <div class="field">
+            <label>Ou cole o conteúdo de texto do cartão ponto:</label>
+            <textarea id="importRawText" rows="6" placeholder="Data;Entrada 1;Saída 1;Entrada 2;Saída 2...&#10;01/10/2026;08:00;12:00;13:00;18:00" style="font-family:monospace; font-size:12.5px;"></textarea>
+          </div>
+        </div>
+
+        <!-- Preview Results Table -->
+        <div id="importPreviewArea" style="display:none; margin-top:16px;">
+          <h4 style="margin:0 0 8px; font-size:13.5px; color:var(--txt); display:flex; justify-content:space-between;">
+            <span>Pré-visualização dos Lançamentos Detectados:</span>
+            <span id="importCountBadge" class="badge positive">0 dias</span>
+          </h4>
+          <div class="table-responsive" style="max-height:220px; overflow-y:auto;">
+            <table class="data-table" id="importPreviewTable">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>E1</th>
+                  <th>S1</th>
+                  <th>E2</th>
+                  <th>S2</th>
+                  <th>Trabalhado</th>
+                  <th>Saldo Previsto</th>
+                </tr>
+              </thead>
+              <tbody id="importPreviewBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn secondary" onclick="closeImportModal()">Cancelar</button>
+        <button class="btn secondary" onclick="parseRawInput()">Analisar Conteúdo</button>
+        <button class="btn primary" id="btnConfirmImport" onclick="executeImport()" disabled>Confirmar e Sincronizar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ALTERAR MINHA SENHA -->
+  <div class="modal-backdrop" id="changePasswordModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3><svg class="svg-icon"><use href="#icon-key"/></svg> Alterar Minha Senha</h3>
+        <button class="modal-close-btn" onclick="closeChangePasswordModal()"><svg class="svg-icon"><use href="#icon-close"/></svg></button>
+      </div>
+      <form onsubmit="handleSelfPasswordChange(event)" novalidate>
+        <div class="modal-body" style="display:flex; flex-direction:column; gap:14px;">
+          <div class="field">
+            <label>Nova Senha</label>
+            <input type="password" id="selfNewPassword" required minlength="6" placeholder="Mínimo 6 caracteres">
+          </div>
+          <div class="field">
+            <label>Confirmar Nova Senha</label>
+            <input type="password" id="selfConfirmPassword" required minlength="6" placeholder="Repita a nova senha">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn secondary" onclick="closeChangePasswordModal()">Cancelar</button>
+          <button type="submit" class="btn primary">Salvar Nova Senha</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADMIN RESET SENHA DE USUARIO -->
+  <div class="modal-backdrop" id="admResetModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3><svg class="svg-icon"><use href="#icon-key"/></svg> Redefinir Senha de Usuário</h3>
+        <button class="modal-close-btn" onclick="closeAdminResetModal()"><svg class="svg-icon"><use href="#icon-close"/></svg></button>
+      </div>
+      <form onsubmit="handleConfirmAdminReset(event)" novalidate>
+        <div class="modal-body" style="display:flex; flex-direction:column; gap:14px;">
+          <input type="hidden" id="admResetUserId">
+          <div class="field">
+            <label>Usuário Alvo</label>
+            <input type="text" id="admResetUserName" readonly style="background:var(--surface-2);">
+          </div>
+          <div class="field">
+            <label>Nova Senha Provisória</label>
+            <input type="password" id="admResetNewPass" required minlength="6" placeholder="Digite a nova senha">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn secondary" onclick="closeAdminResetModal()">Cancelar</button>
+          <button type="submit" class="btn primary">Confirmar Redefinição</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- APPLICATION JAVASCRIPT -->
+  <script>
+  // SUPABASE CONFIGURATION
+  const SUPABASE_CONFIG = {
+    url: "https://zxkikslpehynkhdyhugq.supabase.co",
+    anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4a2lrc2xwZWh5bmtoZHlodWdxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQ1Njc5NjYsImV4cCI6MjExMDE0Mzk2Nn0.N_vGKJ7ZT4hiy40Sfa6l_7ZF1PN9oPlK5egZZzchQp0"
+  };
+
+  const $ = id => document.getElementById(id);
+
+  // NATIVE SUPABASE REST CLIENT (100% INDEPENDENT OF EXTERNAL SCRIPTS)
+  class NativeSupabase {
+    constructor(config) {
+      this.url = config.url;
+      this.anonKey = config.anonKey;
+      this.session = JSON.parse(localStorage.getItem('timebank_session') || 'null');
+    }
+
+    getHeaders(auth = true) {
+      const h = {
+        'apikey': this.anonKey,
+        'Content-Type': 'application/json'
+      };
+      if (auth && this.session && this.session.access_token) {
+        h['Authorization'] = 'Bearer ' + this.session.access_token;
+      }
+      return h;
+    }
+
+    async signIn(username, password) {
+      const cleanUser = username.toLowerCase().trim();
+      const email = cleanUser.includes('@') ? cleanUser : cleanUser + '@bancodehoras.app';
+      const res = await fetch(this.url + '/auth/v1/token?grant_type=password', {
+        method: 'POST',
+        headers: this.getHeaders(false),
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error_description || data.msg || data.message || 'Usuário ou senha inválidos.');
+      this.session = data;
+      localStorage.setItem('timebank_session', JSON.stringify(data));
+      return data;
+    }
+
+    async signUp(username, password, fullName, role = 'user') {
+      const cleanUser = username.toLowerCase().trim();
+      const email = cleanUser + '@bancodehoras.app';
+      const res = await fetch(this.url + '/auth/v1/signup', {
+        method: 'POST',
+        headers: this.getHeaders(false),
+        body: JSON.stringify({
+          email,
+          password,
+          data: { username: cleanUser, full_name: fullName, role }
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.msg || data.message || 'Erro ao criar usuário.');
+      return data;
+    }
+
+    async updatePassword(newPassword) {
+      const res = await fetch(this.url + '/auth/v1/user', {
+        method: 'PUT',
+        headers: this.getHeaders(true),
+        body: JSON.stringify({ password: newPassword })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || data.msg || 'Erro ao alterar senha.');
+      return data;
+    }
+
+    async signOut() {
+      if (this.session && this.session.access_token) {
+        try {
+          await fetch(this.url + '/auth/v1/logout', { method: 'POST', headers: this.getHeaders(true) });
+        } catch(e) {}
+      }
+      this.session = null;
+      localStorage.removeItem('timebank_session');
+    }
+
+    async select(table, query = '') {
+      const url = `${this.url}/rest/v1/${table}${query ? '?' + query : ''}`;
+      const res = await fetch(url, { method: 'GET', headers: this.getHeaders(true) });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || 'Erro ao consultar banco.');
+      }
+      return await res.json();
+    }
+
+    async upsert(table, row) {
+      const res = await fetch(`${this.url}/rest/v1/${table}`, {
+        method: 'POST',
+        headers: {
+          ...this.getHeaders(true),
+          'Prefer': 'resolution=merge-duplicates,return=representation'
+        },
+        body: JSON.stringify(row)
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || 'Erro ao gravar registro.');
+      }
+      return await res.json();
+    }
+
+    async delete(table, filter) {
+      const res = await fetch(`${this.url}/rest/v1/${table}?${filter}`, {
+        method: 'DELETE',
+        headers: this.getHeaders(true)
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || 'Erro ao excluir.');
+      }
+      return true;
+    }
+
+    async rpc(fn, args = {}) {
+      const res = await fetch(`${this.url}/rest/v1/rpc/${fn}`, {
+        method: 'POST',
+        headers: this.getHeaders(true),
+        body: JSON.stringify(args)
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.message || 'Erro no procedimento.');
+      return data;
+    }
+  }
+
+  const client = new NativeSupabase(SUPABASE_CONFIG);
+
+  // APPLICATION STATE & OFFLINE MANAGER
+  let currentUser = null;
+  let userProfile = null;
+  let appState = {
+    entries: [],
+    pointEntries: [],
+    planning: [],
+    parsedImportEntries: []
+  };
+
+  // OFFLINE FIRST REPOSITORY
+  const OfflineRepository = {
+    getSnapshotKey: uid => `timebank_snapshot_${uid}`,
+    getQueueKey: uid => `timebank_sync_queue_${uid}`,
+
+    saveSnapshot(uid, state) {
+      try {
+        localStorage.setItem(this.getSnapshotKey(uid), JSON.stringify({
+          entries: state.entries,
+          pointEntries: state.pointEntries,
+          planning: state.planning,
+          timestamp: new Date().toISOString()
+        }));
+      } catch(e) { console.warn("Falha ao gravar cache local", e); }
+    },
+
+    loadSnapshot(uid) {
+      try {
+        const raw = localStorage.getItem(this.getSnapshotKey(uid));
+        return raw ? JSON.parse(raw) : null;
+      } catch(e) { return null; }
+    },
+
+    getQueue(uid) {
+      try {
+        const raw = localStorage.getItem(this.getQueueKey(uid));
+        return raw ? JSON.parse(raw) : [];
+      } catch(e) { return []; }
+    },
+
+    addToQueue(uid, op) {
+      const q = this.getQueue(uid);
+      q.push({ ...op, id: 'op_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5), time: Date.now() });
+      localStorage.setItem(this.getQueueKey(uid), JSON.stringify(q));
+      updateNetworkPill();
+    },
+
+    clearQueue(uid) {
+      localStorage.removeItem(this.getQueueKey(uid));
+      updateNetworkPill();
+    }
+  };
+
+  // NETWORK & SYNC STATUS LISTENER
+  function updateNetworkPill() {
+    const pill = $('syncStatusPill');
+    const text = $('syncStatusText');
+    if (!pill || !text) return;
+
+    if (!navigator.onLine) {
+      pill.className = 'status-pill offline';
+      text.textContent = 'Modo Offline (dados locais)';
+      return;
+    }
+
+    if (currentUser) {
+      const q = OfflineRepository.getQueue(currentUser.id);
+      if (q.length > 0) {
+        pill.className = 'status-pill syncing';
+        text.textContent = `${q.length} pendente(s) de sincronizar`;
+        return;
+      }
+    }
+
+    pill.className = 'status-pill online';
+    text.textContent = 'Sincronizado';
+  }
+
+  window.addEventListener('online', () => {
+    showToast("Conexão com a internet restabelecida! Sincronizando...", "info");
+    manualForceSync();
+  });
+  window.addEventListener('offline', () => {
+    updateNetworkPill();
+    showToast("Sem conexão com a internet. Usando base local offline.", "warning");
+  });
+
+  // PWA SERVICE WORKER REGISTRATION
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').then(() => {
+        console.log("PWA Service Worker ativo.");
+      }).catch(err => {
+        console.warn("Falha ao registrar Service Worker:", err);
+      });
+    });
+  }
+
+  // TIME ARITHMETIC UTILITIES (TESTED & BULLETPROOF)
+  function parseTime(t) {
+    if (!t || typeof t !== 'string') return null;
+    const parts = t.trim().split(':');
+    if (parts.length < 2) return null;
+    const h = parseInt(parts[0], 10);
+    const m = parseInt(parts[1], 10);
+    if (isNaN(h) || isNaN(m)) return null;
+    return h * 60 + m;
+  }
+
+  function formatMinutes(m, withSign = true) {
+    if (m === null || isNaN(m)) return '--:--';
+    const isNeg = m < 0;
+    const abs = Math.abs(m);
+    const hours = Math.floor(abs / 60);
+    const mins = abs % 60;
+    const pad = (n) => String(n).padStart(2, '0');
+    const sign = isNeg ? '-' : (withSign ? '+' : '');
+    return `${sign}${pad(hours)}:${pad(mins)}`;
+  }
+
+  function calculateDailyWorked(in1, out1, in2, out2) {
+    const t_in1 = parseTime(in1);
+    const t_out1 = parseTime(out1);
+    const t_in2 = parseTime(in2);
+    const t_out2 = parseTime(out2);
+
+    let total = 0;
+    if (t_in1 !== null && t_out1 !== null && t_out1 >= t_in1) total += (t_out1 - t_in1);
+    if (t_in2 !== null && t_out2 !== null && t_out2 >= t_in2) total += (t_out2 - t_in2);
+    return total;
+  }
+
+  function getWeekdayName(dateStr) {
+    if (!dateStr) return '';
+    const parts = dateStr.split('-');
+    if (parts.length < 3) return '';
+    const d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+    const days = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+    return days[d.getDay()] || '';
+  }
+
+  function formatDateBR(dateStr) {
+    if (!dateStr) return '';
+    const parts = dateStr.split('-');
+    if (parts.length < 3) return dateStr;
+    return `${parts[2]}/${parts[1]}/${parts[0]}`;
+  }
+
+  // AUTH LOGIC
+  function switchAuthTab(tab) {
+    $('tabLogin').style.borderBottomColor = tab === 'login' ? 'var(--g)' : 'transparent';
+    $('tabLogin').style.color = tab === 'login' ? 'var(--g)' : 'var(--mut)';
+    $('tabRegister').style.borderBottomColor = tab === 'register' ? 'var(--g)' : 'transparent';
+    $('tabRegister').style.color = tab === 'register' ? 'var(--g)' : 'var(--mut)';
+    $('loginForm').style.display = tab === 'login' ? 'flex' : 'none';
+    $('registerForm').style.display = tab === 'register' ? 'flex' : 'none';
+    $('authError').style.display = 'none';
+  }
+
+  async function handleLogin(e) {
+    e.preventDefault();
+    const username = $('loginUsername').value.trim();
+    const password = $('loginPassword').value;
+    const btn = $('btnLoginSubmit');
+    const errBox = $('authError');
+
+    btn.disabled = true;
+    btn.textContent = "Verificando...";
+    errBox.style.display = 'none';
+
+    try {
+      const data = await client.signIn(username, password);
+      showToast("Conectado com sucesso!", "success");
+      await initAuthenticatedSession(data.user);
+    } catch(err) {
+      errBox.textContent = err.message || "Usuário ou senha incorretos.";
+      errBox.style.display = 'block';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Acessar Sistema";
+    }
+  }
+
+  async function handleRegister(e) {
+    e.preventDefault();
+    const fullName = $('regFullName').value.trim();
+    const username = $('regUsername').value.trim().toLowerCase();
+    const password = $('regPassword').value;
+    const confirm = $('regPasswordConfirm').value;
+    const btn = $('btnRegSubmit');
+    const errBox = $('authError');
+
+    if (password !== confirm) {
+      errBox.textContent = "As senhas informadas não coincidem.";
+      errBox.style.display = 'block';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = "Criando usuário...";
+    errBox.style.display = 'none';
+
+    try {
+      const res = await client.signUp(username, password, fullName, 'user');
+      showToast("Conta criada com sucesso!", "success");
+      const loginData = await client.signIn(username, password);
+      await initAuthenticatedSession(loginData.user);
+    } catch(err) {
+      errBox.textContent = err.message || "Erro ao criar usuário.";
+      errBox.style.display = 'block';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Criar Meu Usuário";
+    }
+  }
+
+  async function handleLogout() {
+    if (!confirm("Deseja realmente sair da sua conta?")) return;
+    await client.signOut();
+    currentUser = null;
+    userProfile = null;
+    $('authBackdrop').classList.add('open');
+    $('userDropdown').classList.remove('open');
+    showToast("Sessão encerrada.", "info");
+  }
+
+  async function initAuthenticatedSession(user) {
+    currentUser = user;
+    $('authBackdrop').classList.remove('open');
+
+    // Load Profile
+    try {
+      const profiles = await client.select('timebank_profiles', 'id=eq.' + user.id);
+      userProfile = profiles && profiles[0] ? profiles[0] : {
+        username: user.user_metadata?.username || user.email.split('@')[0],
+        full_name: user.user_metadata?.full_name || 'Usuário',
+        role: user.user_metadata?.role || 'user'
+      };
+    } catch(e) {
+      userProfile = {
+        username: user.user_metadata?.username || 'usuario',
+        full_name: user.user_metadata?.full_name || 'Usuário',
+        role: user.user_metadata?.role || 'user'
+      };
+    }
+
+    // UI Identity updates
+    const initials = (userProfile.full_name || 'U').split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+    $('sideAvatar').textContent = initials;
+    $('sideUserName').textContent = userProfile.full_name;
+    $('sideUserRole').textContent = userProfile.role === 'admin' ? 'Administrador' : 'Colaborador';
+    $('topbarUsername').textContent = '@' + userProfile.username;
+
+    // Toggle Admin navigation
+    if (userProfile.role === 'admin') {
+      $('adminNavGroup').style.display = 'block';
+    } else {
+      $('adminNavGroup').style.display = 'none';
+    }
+
+    // Set today as default in entry form
+    const today = new Date().toISOString().split('T')[0];
+    if ($('entryDate')) $('entryDate').value = today;
+
+    // Load user data from Supabase / Offline snapshot
+    await loadUserData();
+    updateNetworkPill();
+  }
+
+  // DATA LOADING & OFFLINE RESILIENCE
+  async function loadUserData() {
+    if (!currentUser) return;
+
+    // Try to load offline snapshot first (instant render)
+    const snapshot = OfflineRepository.loadSnapshot(currentUser.id);
+    if (snapshot) {
+      appState.entries = snapshot.entries || [];
+      appState.pointEntries = snapshot.pointEntries || [];
+      appState.planning = snapshot.planning || [];
+      renderAllViews();
+    }
+
+    // If online, fetch fresh data from Supabase
+    if (navigator.onLine) {
+      try {
+        const [entries, pointEntries, planning] = await Promise.all([
+          client.select('timebank_entries', 'user_id=eq.' + currentUser.id + '&order=date.desc'),
+          client.select('timebank_point_entries', 'user_id=eq.' + currentUser.id + '&order=date.desc'),
+          client.select('timebank_planning', 'user_id=eq.' + currentUser.id + '&order=date.asc')
+        ]);
+
+        appState.entries = entries || [];
+        appState.pointEntries = pointEntries || [];
+        appState.planning = planning || [];
+
+        // Save fresh snapshot
+        OfflineRepository.saveSnapshot(currentUser.id, appState);
+        renderAllViews();
+        updateNetworkPill();
+      } catch(err) {
+        console.warn("Falha ao atualizar dados com a nuvem, mantendo snapshot local:", err);
+      }
+    }
+  }
+
+  // RENDER VIEWS
+  function renderAllViews() {
+    renderDashboard();
+    renderPointTable();
+    renderPlanningTable();
+    if (userProfile && userProfile.role === 'admin') {
+      loadAdminUsers();
+    }
+  }
+
+  function renderDashboard() {
+    const tbody = $('entriesTableBody');
+    if (!tbody) return;
+
+    if (appState.entries.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:28px; color:var(--mut);">Nenhum lançamento registrado ainda. Adicione acima ou importe o cartão ponto.</td></tr>';
+      updateKPIs(0, 0, 0);
+      return;
+    }
+
+    let totalSaldoMinutes = 0;
+    let mesSaldoMinutes = 0;
+    const currentMonth = new Date().toISOString().slice(0, 7);
+
+    tbody.innerHTML = appState.entries.map(e => {
+      const worked = calculateDailyWorked(e.in1, e.out1, e.in2, e.out2);
+      const standard = 8 * 60; // 8 hours standard
+      const saldo = e.double_hours ? (worked * 2 - standard) : (worked - standard);
+      totalSaldoMinutes += saldo;
+      if (e.date.startsWith(currentMonth)) mesSaldoMinutes += saldo;
+
+      const isPos = saldo >= 0;
+      const saldoBadge = `<span class="badge ${isPos ? 'positive' : 'negative'}">${formatMinutes(saldo)}</span>`;
+      const weekday = getWeekdayName(e.date);
+
+      return `
+        <tr>
+          <td><b>${formatDateBR(e.date)}</b></td>
+          <td style="color:var(--mut); font-size:12px;">${weekday}</td>
+          <td>${e.in1 || '--:--'}</td>
+          <td>${e.out1 || '--:--'}</td>
+          <td>${e.in2 || '--:--'}</td>
+          <td>${e.out2 || '--:--'}</td>
+          <td>${formatMinutes(worked, false)}</td>
+          <td>${saldoBadge}</td>
+          <td>
+            <button class="btn secondary icon-only" onclick="deleteEntry('${e.date}')" title="Excluir lançamento">
+              <svg class="svg-icon sm" style="stroke:var(--red);"><use href="#icon-trash"/></svg>
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    updateKPIs(totalSaldoMinutes, mesSaldoMinutes, appState.entries.length);
+  }
+
+  function updateKPIs(totalSaldo, mesSaldo, count) {
+    const kpiTotal = $('kpiSaldoTotal');
+    const kpiMes = $('kpiSaldoMes');
+    const kpiCount = $('kpiCountLancamentos');
+    const kpiCred = $('kpiCreditosPonto');
+
+    if (kpiTotal) {
+      kpiTotal.textContent = formatMinutes(totalSaldo);
+      kpiTotal.style.color = totalSaldo >= 0 ? 'var(--g)' : 'var(--red)';
+    }
+    if (kpiMes) {
+      kpiMes.textContent = formatMinutes(mesSaldo);
+      kpiMes.style.color = mesSaldo >= 0 ? 'var(--g)' : 'var(--red)';
+    }
+    if (kpiCount) kpiCount.textContent = count;
+    if (kpiCred) kpiCred.textContent = appState.pointEntries.length;
+  }
+
+  function renderPointTable() {
+    const tbody = $('pointTableBody');
+    if (!tbody) return;
+
+    if (appState.pointEntries.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:28px; color:var(--mut);">Nenhum arquivo de cartão ponto importado ainda. Clique em "Importar Arquivo".</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = appState.pointEntries.map(p => {
+      const batidas = [p.in1, p.out1, p.in2, p.out2].filter(Boolean).join(' • ') || 'Sem batidas';
+      const worked = calculateDailyWorked(p.in1, p.out1, p.in2, p.out2);
+      const standard = 8 * 60;
+      const saldo = worked - standard;
+      const isPos = saldo >= 0;
+
+      return `
+        <tr>
+          <td><b>${formatDateBR(p.date)}</b></td>
+          <td style="color:var(--mut); font-size:12px;">${getWeekdayName(p.date)}</td>
+          <td><span style="font-family:monospace; font-size:12.5px;">${batidas}</span></td>
+          <td>${formatMinutes(worked, false)}</td>
+          <td><span class="badge ${isPos ? 'positive' : 'negative'}">${formatMinutes(saldo)}</span></td>
+          <td><span class="badge neutral">${p.status || 'Importado'}</span></td>
+          <td>
+            <button class="btn secondary" style="padding:4px 8px; font-size:11.5px;" onclick="convertPointToEntry('${p.date}')">
+              Lançar no Banco
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  function renderPlanningTable() {
+    const tbody = $('planTableBody');
+    if (!tbody) return;
+
+    if (appState.planning.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:var(--mut);">Nenhuma meta ou folga planejada.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = appState.planning.map((pl, idx) => `
+      <tr>
+        <td><b>${formatDateBR(pl.date)}</b></td>
+        <td><span class="badge neutral">${pl.type || 'Meta'}</span></td>
+        <td>${pl.hours} horas</td>
+        <td>
+          <button class="btn secondary icon-only" onclick="deletePlan('${pl.id || idx}')" title="Excluir">
+            <svg class="svg-icon sm" style="stroke:var(--red);"><use href="#icon-trash"/></svg>
+          </button>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  // CRUD FOR ENTRIES (OFFLINE FIRST WITH QUEUE)
+  async function handleSaveEntry(e) {
+    e.preventDefault();
+    if (!currentUser) return;
+
+    const date = $('entryDate').value;
+    const in1 = $('entryIn1').value || null;
+    const out1 = $('entryOut1').value || null;
+    const in2 = $('entryIn2').value || null;
+    const out2 = $('entryOut2').value || null;
+    const double_hours = $('entryDouble').value === 'true';
+
+    const newRecord = {
+      user_id: currentUser.id,
+      date,
+      in1,
+      out1,
+      in2,
+      out2,
+      double_hours,
+      status: 'Registrado',
+      source: 'manual'
+    };
+
+    // Optimistic local update
+    const existingIdx = appState.entries.findIndex(it => it.date === date);
+    if (existingIdx >= 0) appState.entries[existingIdx] = newRecord;
+    else appState.entries.unshift(newRecord);
+    appState.entries.sort((a, b) => b.date.localeCompare(a.date));
+
+    OfflineRepository.saveSnapshot(currentUser.id, appState);
+    renderDashboard();
+    showToast("Lançamento gravado!", "success");
+
+    // Network sync or queue
+    if (navigator.onLine) {
+      try {
+        await client.upsert('timebank_entries', newRecord);
+      } catch(err) {
+        OfflineRepository.addToQueue(currentUser.id, { action: 'upsert', table: 'timebank_entries', data: newRecord });
+      }
+    } else {
+      OfflineRepository.addToQueue(currentUser.id, { action: 'upsert', table: 'timebank_entries', data: newRecord });
+    }
+  }
+
+  async function deleteEntry(date) {
+    if (!confirm(`Deseja excluir o lançamento do dia ${formatDateBR(date)}?`)) return;
+    if (!currentUser) return;
+
+    // Optimistic local removal
+    appState.entries = appState.entries.filter(it => it.date !== date);
+    OfflineRepository.saveSnapshot(currentUser.id, appState);
+    renderDashboard();
+    showToast("Lançamento removido.", "info");
+
+    // Network delete or queue
+    const filter = `user_id=eq.${currentUser.id}&date=eq.${date}`;
+    if (navigator.onLine) {
+      try {
+        await client.delete('timebank_entries', filter);
+      } catch(err) {
+        OfflineRepository.addToQueue(currentUser.id, { action: 'delete', table: 'timebank_entries', filter });
+      }
+    } else {
+      OfflineRepository.addToQueue(currentUser.id, { action: 'delete', table: 'timebank_entries', filter });
+    }
+  }
+
+  async function handleClearAll() {
+    if (!confirm("ATENÇÃO: Deseja apagar TODOS os seus lançamentos da base? Esta ação é irreversível.")) return;
+    if (!currentUser) return;
+
+    appState.entries = [];
+    appState.pointEntries = [];
+    appState.planning = [];
+    OfflineRepository.saveSnapshot(currentUser.id, appState);
+    renderAllViews();
+    showToast("Todos os registros locais foram limpos.", "info");
+
+    if (navigator.onLine) {
+      try {
+        await client.delete('timebank_entries', 'user_id=eq.' + currentUser.id);
+        await client.delete('timebank_point_entries', 'user_id=eq.' + currentUser.id);
+        await client.delete('timebank_planning', 'user_id=eq.' + currentUser.id);
+      } catch(e) {}
+    }
+  }
+
+  // SMART CSV / TSV / JSON TIME CARD PARSER ("Outubro.csv")
+  function openImportModal() {
+    $('importModal').classList.add('open');
+    $('importPreviewArea').style.display = 'none';
+    $('btnConfirmImport').disabled = true;
+    appState.parsedImportEntries = [];
+  }
+  function closeImportModal() { $('importModal').classList.remove('open'); }
+
+  function handleDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('dragover'); }
+  function handleDragLeave(e) { e.currentTarget.classList.remove('dragover'); }
+  function handleDrop(e) {
+    e.preventDefault();
+    e.currentTarget.classList.remove('dragover');
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      readFile(e.dataTransfer.files[0]);
+    }
+  }
+  function handleFileSelect(e) {
+    if (e.target.files && e.target.files[0]) readFile(e.target.files[0]);
+  }
+  function readFile(file) {
+    const r = new FileReader();
+    r.onload = ev => {
+      $('importRawText').value = ev.target.result;
+      parseRawInput();
+    };
+    r.readAsText(file);
+  }
+
+  function parseRawInput() {
+    const text = $('importRawText').value.trim();
+    if (!text) return alert("Selecione um arquivo ou cole o conteúdo do cartão ponto.");
+
+    // Check if JSON
+    if (text.startsWith('{') || text.startsWith('[')) {
+      try {
+        const json = JSON.parse(text);
+        const list = Array.isArray(json) ? json : (json.entries || []);
+        appState.parsedImportEntries = list.map(it => ({
+          date: it.date,
+          in1: it.in1 || null,
+          out1: it.out1 || null,
+          in2: it.in2 || null,
+          out2: it.out2 || null,
+          double_hours: !!it.double_hours
+        }));
+        renderImportPreview();
+        return;
+      } catch(e) {}
+    }
+
+    // CSV / TSV Intelligent Parser
+    const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+    const results = [];
+    const timeRegex = /\b([01]?\d|2[0-3]):[0-5]\d\b/g;
+    const dateBRRegex = /\b(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})\b/;
+    const dateISORegex = /\b(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})\b/;
+
+    for (const line of lines) {
+      // Find date
+      let isoDate = null;
+      const matchBR = line.match(dateBRRegex);
+      if (matchBR) {
+        const day = matchBR[1].padStart(2, '0');
+        const month = matchBR[2].padStart(2, '0');
+        let year = matchBR[3];
+        if (year.length === 2) year = '20' + year;
+        isoDate = `${year}-${month}-${day}`;
+      } else {
+        const matchISO = line.match(dateISORegex);
+        if (matchISO) {
+          isoDate = `${matchISO[1]}-${matchISO[2].padStart(2, '0')}-${matchISO[3].padStart(2, '0')}`;
+        }
+      }
+
+      if (!isoDate) continue;
+
+      // Find all punches
+      const times = line.match(timeRegex) || [];
+      if (times.length === 0) continue;
+
+      results.push({
+        date: isoDate,
+        in1: times[0] || null,
+        out1: times[1] || null,
+        in2: times[2] || null,
+        out2: times[3] || null,
+        double_hours: false
+      });
+    }
+
+    if (results.length === 0) {
+      alert("Nenhum dia de ponto com horários válidos foi detectado no arquivo. Verifique o formato.");
+      return;
+    }
+
+    appState.parsedImportEntries = results;
+    renderImportPreview();
+  }
+
+  function renderImportPreview() {
+    const list = appState.parsedImportEntries;
+    $('importCountBadge').textContent = `${list.length} dias identificados`;
+    $('importPreviewArea').style.display = 'block';
+    $('btnConfirmImport').disabled = false;
+
+    const tbody = $('importPreviewBody');
+    tbody.innerHTML = list.slice(0, 31).map(it => {
+      const worked = calculateDailyWorked(it.in1, it.out1, it.in2, it.out2);
+      const saldo = worked - (8 * 60);
+      return `
+        <tr>
+          <td><b>${formatDateBR(it.date)}</b></td>
+          <td>${it.in1 || '--:--'}</td>
+          <td>${it.out1 || '--:--'}</td>
+          <td>${it.in2 || '--:--'}</td>
+          <td>${it.out2 || '--:--'}</td>
+          <td>${formatMinutes(worked, false)}</td>
+          <td><span class="badge ${saldo >= 0 ? 'positive' : 'negative'}">${formatMinutes(saldo)}</span></td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  async function executeImport() {
+    if (!currentUser || appState.parsedImportEntries.length === 0) return;
+    const btn = $('btnConfirmImport');
+    btn.disabled = true;
+    btn.textContent = "Sincronizando...";
+
+    const entriesToSave = appState.parsedImportEntries.map(it => ({
+      user_id: currentUser.id,
+      date: it.date,
+      in1: it.in1,
+      out1: it.out1,
+      in2: it.in2,
+      out2: it.out2,
+      double_hours: it.double_hours,
+      status: 'Importado de Cartão Ponto',
+      source: 'csv_import'
+    }));
+
+    // Merge into local state
+    for (const item of entriesToSave) {
+      const idx = appState.entries.findIndex(e => e.date === item.date);
+      if (idx >= 0) appState.entries[idx] = item;
+      else appState.entries.push(item);
+    }
+    appState.entries.sort((a, b) => b.date.localeCompare(a.date));
+    OfflineRepository.saveSnapshot(currentUser.id, appState);
+    renderAllViews();
+
+    closeImportModal();
+    showToast(`${entriesToSave.length} dias importados com sucesso!`, "success");
+
+    // Cloud batch upsert
+    if (navigator.onLine) {
+      for (const item of entriesToSave) {
+        try {
+          await client.upsert('timebank_entries', item);
+        } catch(e) {
+          OfflineRepository.addToQueue(currentUser.id, { action: 'upsert', table: 'timebank_entries', data: item });
+        }
+      }
+    } else {
+      for (const item of entriesToSave) {
+        OfflineRepository.addToQueue(currentUser.id, { action: 'upsert', table: 'timebank_entries', data: item });
+      }
+    }
+    btn.disabled = false;
+    btn.textContent = "Confirmar e Sincronizar";
+  }
+
+  // EXPORT CSV
+  function exportCSV() {
+    if (appState.entries.length === 0) return alert("Não há lançamentos para exportar.");
+    const header = "Data;Dia;Entrada 1;Saida 1;Entrada 2;Saida 2;Horas Trabalhadas;Saldo Minutos;Saldo Formatado\n";
+    const rows = appState.entries.map(e => {
+      const worked = calculateDailyWorked(e.in1, e.out1, e.in2, e.out2);
+      const saldo = worked - (8 * 60);
+      return `${formatDateBR(e.date)};${getWeekdayName(e.date)};${e.in1 || ''};${e.out1 || ''};${e.in2 || ''};${e.out2 || ''};${formatMinutes(worked, false)};${saldo};${formatMinutes(saldo)}`;
+    }).join('\n');
+
+    const blob = new Blob([header + rows], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `banco_de_horas_${userProfile ? userProfile.username : 'export'}.csv`;
+    a.click();
+    showToast("Arquivo CSV baixado!", "success");
+  }
+
+  // USER SELF-SERVICE PASSWORD CHANGE
+  function openChangePasswordModal() {
+    $('changePasswordModal').classList.add('open');
+    $('userDropdown').classList.remove('open');
+    $('selfNewPassword').value = '';
+    $('selfConfirmPassword').value = '';
+  }
+  function closeChangePasswordModal() { $('changePasswordModal').classList.remove('open'); }
+
+  async function handleSelfPasswordChange(e) {
+    e.preventDefault();
+    const p1 = $('selfNewPassword').value;
+    const p2 = $('selfConfirmPassword').value;
+    if (p1 !== p2) return alert("As senhas informadas não conferem.");
+    if (p1.length < 6) return alert("A senha deve ter no mínimo 6 caracteres.");
+
+    try {
+      await client.updatePassword(p1);
+      closeChangePasswordModal();
+      showToast("Sua senha foi alterada com sucesso!", "success");
+    } catch(err) {
+      alert("Erro ao alterar senha: " + err.message);
+    }
+  }
+
+  // ADMIN CONTROLS (DEDICATED ADMIN TAB)
+  let adminUsersList = [];
+  async function loadAdminUsers() {
+    if (!currentUser || (userProfile && userProfile.role !== 'admin')) return;
+    try {
+      const users = await client.rpc('admin_list_users', {});
+      adminUsersList = users || [];
+      renderAdminUsersTable(adminUsersList);
+
+      $('admKpiUsers').textContent = adminUsersList.length;
+      $('admKpiAdmins').textContent = adminUsersList.filter(u => u.role === 'admin').length;
+      const totalGlobalEntries = adminUsersList.reduce((acc, u) => acc + (parseInt(u.entries_count) || 0), 0);
+      $('admKpiEntries').textContent = totalGlobalEntries;
+    } catch(err) {
+      console.warn("Falha ao carregar lista de usuários admin:", err);
+    }
+  }
+
+  function renderAdminUsersTable(users) {
+    const tbody = $('admUsersTableBody');
+    if (!tbody) return;
+
+    if (users.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:24px; color:var(--mut);">Nenhum usuário encontrado.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = users.map(u => `
+      <tr>
+        <td><b>@${u.username}</b></td>
+        <td>${u.full_name || 'Sem nome'}</td>
+        <td><span class="badge ${u.role === 'admin' ? 'admin' : 'user'}">${u.role === 'admin' ? 'Administrador' : 'Colaborador'}</span></td>
+        <td style="color:var(--mut); font-size:12px;">${formatDateBR(u.created_at.split('T')[0])}</td>
+        <td><b>${u.entries_count || 0}</b> lançamentos</td>
+        <td>
+          <div style="display:flex; gap:6px;">
+            <button class="btn secondary icon-only" onclick="openAdminResetModal('${u.user_id}', '${u.username}')" title="Redefinir senha">
+              <svg class="svg-icon sm"><use href="#icon-key"/></svg>
+            </button>
+            ${u.username !== 'admin' && u.username !== (userProfile ? userProfile.username : '') ? `
+              <button class="btn danger icon-only" onclick="handleAdminDeleteUser('${u.user_id}', '${u.username}')" title="Excluir usuário">
+                <svg class="svg-icon sm"><use href="#icon-trash"/></svg>
+              </button>
+            ` : ''}
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function filterAdminUsers() {
+    const q = $('admUserSearch').value.toLowerCase().trim();
+    const filtered = adminUsersList.filter(u => u.username.toLowerCase().includes(q) || (u.full_name && u.full_name.toLowerCase().includes(q)));
+    renderAdminUsersTable(filtered);
+  }
+
+  async function handleAdminCreateUser(e) {
+    e.preventDefault();
+    const fullName = $('admNewFullName').value.trim();
+    const username = $('admNewUsername').value.trim().toLowerCase();
+    const password = $('admNewPassword').value;
+    const role = $('admNewRole').value;
+
+    try {
+      await client.signUp(username, password, fullName, role);
+      showToast(`Usuário @${username} criado com sucesso!`, "success");
+      $('admNewFullName').value = '';
+      $('admNewUsername').value = '';
+      $('admNewPassword').value = '';
+      await loadAdminUsers();
+    } catch(err) {
+      alert("Erro ao criar usuário: " + err.message);
+    }
+  }
+
+  function openAdminResetModal(userId, username) {
+    $('admResetModal').classList.add('open');
+    $('admResetUserId').value = userId;
+    $('admResetUserName').value = '@' + username;
+    $('admResetNewPass').value = '';
+  }
+  function closeAdminResetModal() { $('admResetModal').classList.remove('open'); }
+
+  async function handleConfirmAdminReset(e) {
+    e.preventDefault();
+    const userId = $('admResetUserId').value;
+    const newPass = $('admResetNewPass').value;
+    if (newPass.length < 6) return alert("A senha deve ter no mínimo 6 caracteres.");
+
+    try {
+      await client.rpc('admin_reset_password', { target_user_id: userId, new_password: newPass });
+      closeAdminResetModal();
+      showToast("Senha redefinida com sucesso!", "success");
+    } catch(err) {
+      alert("Erro ao redefinir senha: " + err.message);
+    }
+  }
+
+  async function handleAdminDeleteUser(userId, username) {
+    if (!confirm(`Tem certeza absoluta de que deseja excluir o usuário @${username} e todos os seus lançamentos?`)) return;
+    try {
+      await client.rpc('admin_delete_user', { target_user_id: userId });
+      showToast(`Usuário @${username} excluído com sucesso.`, "info");
+      await loadAdminUsers();
+    } catch(err) {
+      alert("Erro ao excluir usuário: " + err.message);
+    }
+  }
+
+  // MANUAL FORCE SYNC
+  async function manualForceSync() {
+    if (!currentUser) return;
+    if (!navigator.onLine) {
+      return alert("Dispositivo sem conexão com a internet.");
+    }
+    const q = OfflineRepository.getQueue(currentUser.id);
+    if (q.length === 0) {
+      await loadUserData();
+      showToast("Tudo atualizado e sincronizado com a nuvem!", "success");
+      return;
+    }
+
+    showToast(`Sincronizando ${q.length} operações pendentes...`, "info");
+    for (const op of q) {
+      try {
+        if (op.action === 'upsert') await client.upsert(op.table, op.data);
+        else if (op.action === 'delete') await client.delete(op.table, op.filter);
+      } catch(e) { console.warn("Falha ao sincronizar item da fila", op, e); }
+    }
+    OfflineRepository.clearQueue(currentUser.id);
+    await loadUserData();
+    showToast("Sincronização concluída com sucesso!", "success");
+  }
+
+  // NAVIGATION & UI TOGGLES
+  function showView(viewId, btn) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+    $(viewId).classList.add('active');
+    if (btn) btn.classList.add('active');
+
+    const titles = {
+      'v-dashboard': 'Dashboard & Horas',
+      'v-point': 'Cartão Ponto Oficial',
+      'v-sim': 'Simulação de Banco de Horas',
+      'v-plan': 'Planejamento e Metas',
+      'v-admin': 'Painel Administrativo'
+    };
+    $('pageTitle').textContent = titles[viewId] || 'Banco de Horas';
+
+    if (window.innerWidth <= 900) {
+      document.body.classList.remove('side-open');
+    }
+  }
+
+  function toggleSide() {
+    if (window.innerWidth <= 900) {
+      document.body.classList.toggle('side-open');
+    } else {
+      document.body.classList.toggle('side-collapsed');
+    }
+  }
+
+  function toggleUserDropdown(e) {
+    e.stopPropagation();
+    $('userDropdown').classList.toggle('open');
+  }
+  window.addEventListener('click', () => { $('userDropdown').classList.remove('open'); });
+
+  function toggleDarkMode() {
+    document.body.classList.toggle('dark');
+    const isDark = document.body.classList.contains('dark');
+    localStorage.setItem('timebank_theme', isDark ? 'dark' : 'light');
+    $('themeIcon').innerHTML = `<use href="#icon-${isDark ? 'sun' : 'moon'}"/>`;
+  }
+
+  function showToast(msg, type = 'info') {
+    const c = $('toastContainer');
+    const t = document.createElement('div');
+    t.className = 'toast ' + type;
+    t.innerHTML = `<span>${msg}</span>`;
+    c.appendChild(t);
+    setTimeout(() => {
+      t.style.opacity = '0';
+      t.style.transform = 'translateY(10px)';
+      t.style.transition = 'all .25s ease';
+      setTimeout(() => t.remove(), 250);
+    }, 4000);
+  }
+
+  // INITIALIZATION
+  window.addEventListener('DOMContentLoaded', () => {
+    // Theme restore
+    if (localStorage.getItem('timebank_theme') === 'dark') {
+      document.body.classList.add('dark');
+      $('themeIcon').innerHTML = '<use href="#icon-sun"/>';
+    }
+
+    // Auto login check
+    if (client.session && client.session.user) {
+      initAuthenticatedSession(client.session.user);
+    } else {
+      $('authBackdrop').classList.add('open');
+    }
+
+    // Mobile menu button visibility
+    if (window.innerWidth <= 900) {
+      $('mobileMenuBtn').style.display = 'inline-flex';
+    }
+  });
+  </script>
+</body>
+</html>

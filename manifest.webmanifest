@@ -1,0 +1,31 @@
+{
+  "name": "Controle de Banco de Horas",
+  "short_name": "Banco de Horas",
+  "description": "Sistema profissional de controle de ponto e banco de horas com sincronização em nuvem e suporte offline",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#13251f",
+  "theme_color": "#0f6b45",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
